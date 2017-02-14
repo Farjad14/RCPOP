@@ -138,7 +138,7 @@ console.log(nickname.length);
   	newCar.id = socket.id;
   	newCar.nickname = nickname;
 	cars.push(newCar);
-    console.log('car created and added to cars list. Car id: '+socket.id);
+    console.log('car created and added to cars list. Car id: '+socket.id + " " + nickname);
     socket.emit("id", {id:newCar.id, x:newCar.x, y:newCar.y, orientation:newCar.orientation, 
     		nickname:newCar.nickname});
 	});
@@ -218,12 +218,27 @@ function detectPop(sprite){
         srcCar.speed += (deadCar.speed - 10)*PERC_GAIN + BASE_GAIN;
         if (srcCar.speed > MAX_SPEED) srcCar.speed = MAX_SPEED;
         srcCar.score++;
+		
+		//Update leaderboard
+		updateLeaderboard();
       }
 		}
 		
 	});
 
 });
+
+function compare(a,b) {
+  if (a.score < b.score)
+    return -1;
+  if (a.score > b.score)
+    return 1;
+  return 0;
+}
+
+function updateLeaderboard(){
+	cars.sort(compare);
+}
 
 
 /*
@@ -321,10 +336,10 @@ function generateSpawnLoc(){
   // check that all cars aren't to close to the new spawn point
   // This is a conditional loop not a counted loop
   for(i = 0; i < cars.length; i++){
-			if(cars[i].x + 250 > loc.x) continue;
-      if(cars[i].x - 250 < loc.x) continue;
-      if(cars[i].y + 250 > loc.y) continue;
-      if(cars[i].y - 250 < loc.y) continue;  
+	  if(cars[i].x + 350 > loc.x) continue;
+      if(cars[i].x - 350 < loc.x) continue;
+      if(cars[i].y + 350 > loc.y) continue;
+      if(cars[i].y - 350 < loc.y) continue;  
 			
       // Too close to a car, resart the loop with new location
       loc = generateRandomLoc();

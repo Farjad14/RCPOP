@@ -325,11 +325,7 @@ font-size: 50px;
 
 </div><!-- gameView end -->
 <div id="score">Score: 0</div>
-		<div id="leaderboard">Leaderboard
-		<br/>
-		#1     Jeff     550 <br/>
-		#2     Joe     500<br/>
-		#3     Bill     400</div>
+		<div id="leaderboard">Leaderboard</div>
 
 <div id="go_animation"></div>
 
@@ -1089,6 +1085,17 @@ socket.on('update', function(lists) {
 if(gameState == 0){
 	return;
 }
+lboard = "Scoreboard<br/>";
+
+//Update Leaderboard
+for(i = 0; i < lists.cars.length; i++){
+num = i+ 1;
+lboard += "#"+num+ " " + lists.cars[i].nickname + " " + lists.cars[i].score+"<br/>";
+if(i==10){
+	break;
+	}
+}
+$("#leaderboard").html(lboard);
   //console.log("recieved update from the server.\n List of cars: ");
 try{
 var still_alive = 0;
