@@ -7,10 +7,6 @@ function toDegrees (angle) {
   return angle * (180 / Math.PI);
 }
 
-
-
-
-
 /*
 This is our server app. It's both a web server and a socket.io server. 
 The server listens on port 3000, so you have to mention the port number 
@@ -57,17 +53,15 @@ car = function(x, y, orientation){
 	nickname: null,
 	prev_x:0, 
 	prev_y:0,
-	cur_stamp:0,
-	prev_stamp:0,
+	curCollisionStamp:0,
+	prevCollisionStamp:0,
 	orientation: orientation, //orientatin in degrees
 	id: -1,
 	rotateUnit: 5,
 	collided:0,
-	rotateSlow:0, //initially off
 	speed: speed, //default speed
 	score:0,
 	pUp1TimerStart:-1,
-	socket: null,
 	pUp3TimerStart:-1,
 	alive:1,
 	tipx:0,
@@ -75,6 +69,8 @@ car = function(x, y, orientation){
 	powerUp:0, //no power ups initially
 	balloonx:0,
 	balloony:0,
+	prevPUPStamp:0,
+	curPUPStamp:0,
 	};
 		
 	return self;
@@ -87,8 +83,7 @@ powerUp = function(x, y, type){
 	y:y,
 	type:type,
 	consumed:0, //0 means not consumed / 1 means consumed and ready to be removed
-	};
-		
+	};	
 	return self;
 } 
 
@@ -101,10 +96,6 @@ cars = [];
 
 
 //instantiate the express module and use it to build an http server. 
-//var app = require('express')();
-//var http = require('http').Server(app);
-
-
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
@@ -161,7 +152,6 @@ io.on('connection', function(socket){
 		//the game just started - player #1 wants to join
 		if (numOfClients == 0){
 			
-			
 			//record current time for all three types of power ups
 			//We will use timestamps to know when to refill all power ups of some time
 			Type1Pup = Math.floor(Date.now() / 1000); //in seconds
@@ -178,7 +168,7 @@ io.on('connection', function(socket){
 		//generate random location for the new player
 		var randposition = generateSpawnLoc();
 
-		/* create a new car with position and orientation data from client*/
+		/* create a new car with random position and orientation */
 		newCar = car(randposition.x, randposition.y, randposition.orientation);
 		newCar.id = socket.id;
 		//newCar.socket = socket;
@@ -205,13 +195,12 @@ io.on('connection', function(socket){
 				cars[i].x = data.x;
 				cars[i].y = data.y;
 				cars[i].orientation = data.orientation;
-
+				
 				if(data.x > map_width || data.x < 0 || data.y > map_height || data.y < 0){//out of bounds, dead
 					cars[i].alive = 0;
 				}
-				//console.log("cars[i].x:  "+cars[i].x+ ", cars[i].y: "+cars[i].y+ 
-				//	", "+cars[i].orientation+"cars[i].orientation");
-					break;
+				
+				break;
 			}
 		}
 		//console.log("*******************************");
@@ -226,50 +215,62 @@ io.on('connection', function(socket){
 	accroding to the type of power up consumed by srcCar
 	*/
 	socket.on('powerUp', function(srcCarData){
-		console.log('powerup event');
+		console.log('potential powerup event');
+		
 		//find the car object for the car the sent the collision event
 		var srcCar = findCarById(srcCarData.id);
 		
-		//check to see if the car has indeed consumed a power and if it has, set the powerUp field
-		//to the type of the power - a number - and mark the powerUP object as consumed
-		detectCarPowerupCollisions(srcCar); //this function does all of the above
+		//save current power up time stamp to previous
+		srcCar.prevPUPStamp = srcCar.curPUPStamp;
+			
+		//record time stamp of this power up notification
+		srcCar.curPUPStamp = Date.now();
 		
-		if(srcCar.powerUp == 1){
-			//this is a power down
-			srcCar.rotateUnit -= SPEEDPUP1; //-3
-			//set start timer for power up
-			src.pUp1TimerStart = Math.floor(Date.now() / 1000); //lasts for 10 seconds	
-		}
-		
-		else if(srcCar.powerUp == 2){
-			//we have 4 of this power up - once consumed, your car destroys all cars within radius
-			//all cars within 300 piecels of range/radius die
-			//loop:
-			for(i = 0; i < cars.length; i++){
-				if( (Math.pow( cars[i].x - srcCar.x, 2) + Math.pow( cars[i].y - srcCar.y, 2))  <  
-					Math.pow(300, 2) && (srcCar.id != cars[i].id)){
-					cars[i].alive = 0;	
-					deadCar = cars[i];
-					//increase car's speed by a percent of the killed cars speed plus base amount
-					//srcCar.speed += (deadCar.speed - 10)*PERC_GAIN + BASE_GAIN;
-					srcCar.speed +=1;
-					if (srcCar.speed > MAX_SPEED){
-						srcCar.speed = MAX_SPEED;
+		//if the two collision are too close - within 50ms, ignore the second one
+		if(srcCar.curPUPStamp - srcCar.prevPUPStamp > 50){ //proceed to process the power up request
+			
+			//check to see if the car has indeed consumed a power and if it has, set the powerUp field
+			//to the type of the power - a number - and mark the powerUP object as consumed
+			detectCarPowerupCollisions(srcCar); //this function does all of the above
+			
+			if(srcCar.powerUp == 1){
+				//this is a power down
+				srcCar.rotateUnit -= SPEEDPUP1; //-3
+				//set start timer for power up
+				src.pUp1TimerStart = Math.floor(Date.now() / 1000); //lasts for 10 seconds	
+			}
+			
+			else if(srcCar.powerUp == 2){
+				//we have 4 of this power up - once consumed, your car destroys all cars within radius
+				//all cars within 300 piecels of range/radius die
+				//loop:
+				for(i = 0; i < cars.length; i++){
+					if( (Math.pow( cars[i].x - srcCar.x, 2) + Math.pow( cars[i].y - srcCar.y, 2))  <  
+						Math.pow(300, 2) && (srcCar.id != cars[i].id)){
+						cars[i].alive = 0;	
+						deadCar = cars[i];
+						//increase car's speed by a percent of the killed cars speed plus base amount
+						//srcCar.speed += (deadCar.speed - 10)*PERC_GAIN + BASE_GAIN;
+						srcCar.speed +=1;
+						if (srcCar.speed > MAX_SPEED){
+							srcCar.speed = MAX_SPEED;
+						}
+							srcCar.score++;
 					}
-						srcCar.score++;
 				}
 			}
-		}
-		
-		else if(srcCar.powerUp == 3){
-			//we have only 1 of this power ups -  so this gotta be the special power up 
-			srcCar.speed += SPEEDPUP3; //+3
-			if (srcCar.speed > MAX_SPEED){ 
-				srcCar.speed = MAX_SPEED;
+			
+			else if(srcCar.powerUp == 3){
+				//we have only 1 of this power ups -  so this gotta be the special power up 
+				srcCar.speed += SPEEDPUP3; //+3
+				if (srcCar.speed > MAX_SPEED){ 
+					srcCar.speed = MAX_SPEED;
+				}
+				//this power up lasts for 6 seconds ******* set start timer
+				srcCar.pUp3TimerStart = Math.floor(Date.now() / 1000); 
 			}
-			//this power up lasts for 6 seconds ******* set start timer
-			srcCar.pUp3TimerStart = Math.floor(Date.now() / 1000); 
-		}		
+
+		}
 	}); 
 	
 		/*
@@ -277,43 +278,56 @@ io.on('connection', function(socket){
 	srcCarData contains the car x and y positions as well as the car id
 	*/
 	 socket.on('collision', function(srcCarData){
-		console.log('collision event');
+		console.log('potential collision event');
+			
 		//find the car object for the car the sent the collision event
 		var srcCar = findCarById(srcCarData.id);
 		
-		//next find the target car the collided with srcCar
-		var trgtCar = detectCollision(srcCar);
+		//save previous collision time stamp
+		srcCar.prevCollisionStamp = srcCar.curCollisionStamp;
+			
+		//record time stamp of this collision
+		srcCar.curCollisionStamp = Date.now();
 		
-		if (trgtCar) { //if collision confirmed - trgtCar isn't null
-			srcCar.collided = 1;
-			trgtCar.collided = 1;
+		//if the two collision are too close - within 50ms, ignore the second one
+		if(srcCar.curCollisionStamp - srcCar.prevCollisionStamp > 50){ //proceed to process collision
 			
-			//handle collision event - update orientation and lcoation of both collided cars:
-			newTrgtCarOrientation = srcCar.orientation;
-			newSrcCarOrientation = trgtCar.orientation;
-			var diffInOrientation = Math.abs(srcCar.orientation - trgtCar.orientation);
-			if(diffInOrientation > 90){ //too radical the difference in orientation`
-				newSrcCarOrientation = trgtCar.orientation+((srcCar.orientation - trgtCar.orientation) % 90);
-				newTrgtCarOrientation = srcCar.orientation+((trgtCar.orientation - srcCar.orientation) % 90);
+			//next find the target car the collided with srcCar
+			var trgtCar = detectCollision(srcCar);
+			
+			if (trgtCar) { //if collision confirmed - trgtCar isn't null
 				
+				srcCar.collided = 1;
+				trgtCar.collided = 1;
+				
+				//handle collision event - update orientation and lcoation of both collided cars:
+				newTrgtCarOrientation = srcCar.orientation;
+				newSrcCarOrientation = trgtCar.orientation;
+				var diffInOrientation = Math.abs(srcCar.orientation - trgtCar.orientation);
+				if(diffInOrientation > 90){ //too radical the difference in orientation`
+					newSrcCarOrientation = trgtCar.orientation+((srcCar.orientation - trgtCar.orientation) % 90);
+					newTrgtCarOrientation = srcCar.orientation+((trgtCar.orientation - srcCar.orientation) % 90);
+					
+				}
+				
+				//updated orientation and position of srcCar - position is 100 pixels ahead along the new orientation
+				srcCar.orientation = newSrcCarOrientation;
+				srcCar.x = srcCar.x + (Math.sin(toRadians(srcCar.orientation))*100);
+				srcCar.y = srcCar.y - (Math.cos(toRadians(srcCar.orientation))*100);
+				
+				//updated orientation and position of trgCar - position is 100 pixels ahead along the new orientation
+				trgtCar.orientation = newTrgtCarOrientation;	
+				trgtCar.x= trgtCar.x + (Math.sin(toRadians(trgtCar.orientation))*100);
+				trgtCar.y= trgtCar.y - (Math.cos(toRadians(trgtCar.orientation))*100);
 			}
-			
-			//updated orientation and position of srcCar - position is 100 pixels ahead along the new orientation
-			srcCar.orientation = newSrcCarOrientation;
-			srcCar.x = srcCar.x + (Math.sin(toRadians(srcCar.orientation))*100);
-			srcCar.y = srcCar.y - (Math.cos(toRadians(srcCar.orientation))*100);
-			
-			//updated orientation and position of trgCar - position is 100 pixels ahead along the new orientation
-			trgtCar.orientation = newTrgtCarOrientation;	
-			trgtCar.x= trgtCar.x + (Math.sin(toRadians(trgtCar.orientation))*100);
-			trgtCar.y= trgtCar.y - (Math.cos(toRadians(trgtCar.orientation))*100);
+		
 		}
 	}); 
 		
 	
 		
 	/*
-	car pop even comes from client. Verify pop and update parameters accordingly.
+	car pop event comes from client. Verify pop and update parameters accordingly.
 	*/
 	socket.on('pop', function(srcCarData){
 		//console.log('collision event');
@@ -382,7 +396,6 @@ function findCarById(carId){
 	}
 }
 
-
 /*
 removes all cars in the cars list that marked dead, i.e car.alive = 0
 */
@@ -393,7 +406,6 @@ function removeDeadCars(){
 			cars.splice(i, 1);
 	  }
 	}
-	
 }
 
 function generateRandomLoc() {
@@ -832,7 +844,8 @@ function detectCollision(srcCar){
 				srcCar.tipy = srcCar.y - (Math.cos(toRadians(srcCar.orientation))*100);
 				
 				//check distance between tip and center of cars pairwise for collisions
-				if( (Math.pow( cars[i].tipx - srcCar.x, 2) + Math.pow( cars[i].tipy - srcCar.y, 2))  <  Math.pow(50, 2) ){
+				if( (Math.pow( srcCar.tipx - cars[i].x , 2) + Math.pow( srcCar.tipy - cars[i].y, 2))  
+						<  Math.pow(50, 2) ){
 						return cars[i];
 					
 				}
