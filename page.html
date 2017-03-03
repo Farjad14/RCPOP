@@ -163,6 +163,7 @@ border: 2px solid black;
 			text-align:center;
         }
         .login {
+		color:white;
             position: absolute; /* or absolute */
 			padding:0;
 		width:400px;
@@ -289,6 +290,10 @@ font-size:18px;
 .title{
 font-size: 50px;
 }
+
+#finalScore{
+width: 100%;
+}
 </style>
 <script src="/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="js/jquery-1.11.2.js"></script>
@@ -304,6 +309,7 @@ font-size: 50px;
 	<div id="splashscreen" class="overlay">
         <div class="login">
             <h1 class="title">RC POP</h1>
+			<div id="finalScore"></div>
 			<br/><br/>
                 <input type="text" id="u" class="input" placeholder="Username" autofocus>
 				<br/><br/>
@@ -1053,7 +1059,7 @@ socket.on('id', function(newCar){
 
 	//console.log(newCar);
 	if (newCar == null) {
-		alert("username already taken or too long");
+		alert("username already taken, too long or blank!");
 		return;
 	}
 	// Set our players id
@@ -1090,7 +1096,7 @@ lboard = "Scoreboard<br/>";
 //Update Leaderboard
 for(i = 0; i < lists.cars.length; i++){
 num = i+ 1;
-lboard += "#"+num+ " " + lists.cars[i].nickname + " " + lists.cars[i].score+"<br/>";
+lboard += lists.cars[i].nickname + " " + lists.cars[i].score+"<br/>";
 if(i==10){
 	break;
 	}
@@ -1145,6 +1151,7 @@ var still_alive = 0;
 
 if(still_alive == 0){
 	gameState = 0;
+	$("#finalScore").html("You scored: "+sprite.score);
 	$("#splashscreen").fadeIn(500);
 	
 }
