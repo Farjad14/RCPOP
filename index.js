@@ -133,7 +133,7 @@ io.on('connection', function(socket){
 	Make sure the nickname is valid - if not, return to client with an 'id' taggged message
 	*/
 	socket.on('new client', function(nickname){
-		if(nickname.length > 12){
+		if(nickname.length > 12|| nickname.length < 1){
 			console.log(nickname.length);
 			socket.emit("id", null);
 			return;
@@ -779,9 +779,9 @@ function generateSpawnLoc(){
   // This is a conditional loop not a counted loop
   for(i = 0; i < cars.length; i++){
 			if(cars[i].x + 250 > loc.x) continue;
-      if(cars[i].x - 250 < loc.x) continue;
-      if(cars[i].y + 250 > loc.y) continue;
-      if(cars[i].y - 250 < loc.y) continue;  
+      if(cars[i].x - 350 < loc.x) continue;
+      if(cars[i].y + 350 > loc.y) continue;
+      if(cars[i].y - 350 < loc.y) continue;   
 			
       // Too close to a car, resart the loop with new location
       loc = generateRandomLoc();
