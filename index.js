@@ -352,15 +352,17 @@ io.on('connection', function(socket){
 });
 
 function compare(a,b) {
-  if (a.score < b.score)
-    return -1;
   if (a.score > b.score)
+    return -1;
+  if (a.score < b.score)
     return 1;
   return 0;
 }
 
 function updateLeaderboard(){
 	cars.sort(compare);
+	for(i=0; i<cars.length; i++) console.log(cars[i].score);
+    console.log("Done");
 }
 
 
