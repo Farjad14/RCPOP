@@ -141,11 +141,12 @@ io.on('connection', function(socket){
 		//Check for badname
 		//var regex = readTextFile("http://104.233.105.99/list.txt");
 		fs = require('fs')
-		var regex = fs.readFile('list.txt', 'utf8', function (err,data) {
+		var regex 
+    fs.readFile('list.txt', 'utf8', function (err,data) {
       if (err) {
         return console.log(err);
       }
-      return data;
+      regex = data;
     });
     console.log(regex);
     regex = new RegExp(regex);
