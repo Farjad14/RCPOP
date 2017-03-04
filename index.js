@@ -138,6 +138,21 @@ io.on('connection', function(socket){
 			socket.emit("id", null);
 			return;
 		}
+		//Check for badname
+		//var regex = readTextFile("http://104.233.105.99/list.txt");
+		fs = require('fs')
+		var regex = fs.readFile('list.txt', 'utf8', function (err,data) {
+  if (err) {
+    return console.log(err);
+  }
+  return data;
+});
+regex = new RegExp(regex);
+		if(regex.test(nickname)){
+			console.log("bad word");
+			socket.emit("id", null);
+			return;
+		}
 
 		//is the nickname already taken? 
 		for(i = 0; i < cars.length; i++){
@@ -350,6 +365,24 @@ io.on('connection', function(socket){
 	});
 
 });
+
+function readTextFile(file)
+{
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", file, false);
+    rawFile.onreadystatechange = function ()
+    {
+        if(rawFile.readyState === 4)
+        {
+            if(rawFile.status === 200 || rawFile.status == 0)
+            {
+                var allText = rawFile.responseText;
+                return allText;
+            }
+        }
+    }
+    rawFile.send(null);
+}
 
 function compare(a,b) {
   if (a.score > b.score)
