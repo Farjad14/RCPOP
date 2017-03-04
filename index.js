@@ -147,6 +147,7 @@ io.on('connection', function(socket){
       }
       return data;
     });
+    console.log(regex);
     regex = new RegExp(regex);
 		if(regex.test(nickname)){
 			console.log("bad word");
