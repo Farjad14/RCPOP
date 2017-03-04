@@ -150,9 +150,8 @@ io.on('connection', function(socket){
 		//Check for badname
 		//var regex = readTextFile("http://104.233.105.99/list.txt");
 		
-    console.log(regex);
-    regex = new RegExp(regex);
-		if(regex.test(nickname, "i")){
+    regex = new RegExp(regex, "i");
+		if(regex.test(nickname)){
 			console.log("bad word");
 			socket.emit("id", null);
 			return;
