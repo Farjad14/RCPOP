@@ -152,7 +152,7 @@ io.on('connection', function(socket){
 		
     console.log(regex);
     regex = new RegExp(regex);
-		if(regex.test(nickname)){
+		if(regex.test(nickname, "i")){
 			console.log("bad word");
 			socket.emit("id", null);
 			return;
