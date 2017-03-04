@@ -142,11 +142,11 @@ io.on('connection', function(socket){
 		//var regex = readTextFile("http://104.233.105.99/list.txt");
 		fs = require('fs')
 		var regex = fs.readFile('list.txt', 'utf8', function (err,data) {
-  if (err) {
-    return console.log(err);
-  }
-  return data;
-});
+      if (err) {
+        return console.log(err);
+      }
+      return data;
+    });
     regex = new RegExp(regex);
 		if(regex.test(nickname)){
 			console.log("bad word");
