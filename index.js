@@ -100,7 +100,16 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 
-
+// Read bad words from file
+fs = require('fs')
+var regex;
+fs.readFile('list.txt', 'utf8', function (err,data) {
+  if (err) {
+    return console.log(err);
+  }
+  regex = data;
+});
+    
 //mount a socket.io server on top of the http server. 
 var io = require('socket.io')(http);
 
@@ -140,14 +149,7 @@ io.on('connection', function(socket){
 		}
 		//Check for badname
 		//var regex = readTextFile("http://104.233.105.99/list.txt");
-		fs = require('fs')
-		var regex 
-    fs.readFile('list.txt', 'utf8', function (err,data) {
-      if (err) {
-        return console.log(err);
-      }
-      regex = data;
-    });
+		
     console.log(regex);
     regex = new RegExp(regex);
 		if(regex.test(nickname)){
