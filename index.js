@@ -36,6 +36,7 @@ const SPEEDPUP1 = 3;
 //global variables that define variant quantities in our program
 var numOfClients = 0; //initially zero
 
+
 // type 1 and type 2 power up variables that track time intervals through timestamps
 //basically new power ups are created every some interval (depending on the type of the power up)
 //and these power ups are only spawned again that interval is gone by. 
@@ -53,6 +54,8 @@ car = function(x, y, orientation){
 	nickname: null,
 	prev_x:0, 
 	prev_y:0,
+	prevOrientation:0,
+	prevCollided:0,
 	curCollisionStamp:0,
 	prevCollisionStamp:0,
 	orientation: orientation, //orientatin in degrees
@@ -70,6 +73,7 @@ car = function(x, y, orientation){
 	balloonx:0,
 	balloony:0,
 	prevPUPStamp:0,
+	handlingPop:0,
 	curPUPStamp:0,
 	};
 		
@@ -100,16 +104,7 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 
-// Read bad words from file
-fs = require('fs')
-var regex;
-fs.readFile('list.txt', 'utf8', function (err,data) {
-  if (err) {
-    return console.log(err);
-  }
-  regex = data;
-});
-    
+
 //mount a socket.io server on top of the http server. 
 var io = require('socket.io')(http);
 
@@ -118,6 +113,18 @@ app.get('/', function(req, res){
   res.sendFile(__dirname + '/page.html');
 });
 app.use('/', express.static(__dirname + '/client'));
+
+
+
+// instantiate the filesystem object to read a pattern of bad words from file list.txt
+fs = require('fs')
+var regex;
+fs.readFile('list.txt', 'utf8', function (err,data) {
+  if (err) {
+    return console.log(err);
+  }
+  regex = data;
+});
 
 //connection event from a socket.io client. This event is triggered when 
 //a socket.io client first connects to this server - so once per connection request
@@ -142,16 +149,16 @@ io.on('connection', function(socket){
 	Make sure the nickname is valid - if not, return to client with an 'id' taggged message
 	*/
 	socket.on('new client', function(nickname){
-		if(nickname.length > 12|| nickname.length < 1){
+		if(nickname.length > 12){
 			console.log(nickname.length);
 			socket.emit("id", null);
 			return;
 		}
+		
 		//Check for badname
 		//var regex = readTextFile("http://104.233.105.99/list.txt");
-		
-    regex = new RegExp(regex, "i");
-		if(regex.test(nickname)){
+		regex = new RegExp(regex);
+			if(regex.test(nickname)){
 			console.log("bad word");
 			socket.emit("id", null);
 			return;
@@ -204,26 +211,97 @@ io.on('connection', function(socket){
 	object in the cars list with the new positio and orientation information
 	*/
 	socket.on('position', function(data){
-		for(i = 0; i < cars.length; i++){
-			if(cars[i].id == socket.id){
-				cars[i].prev_x = cars[i].x;
-				cars[i].prev_y = cars[i].y;
-				//cars[i].prev_stamp = cars[i].cur_stamp;
-
-				cars[i].x = data.x;
-				cars[i].y = data.y;
-				cars[i].orientation = data.orientation;
-				
-				if(data.x > map_width || data.x < 0 || data.y > map_height || data.y < 0){//out of bounds, dead
-					cars[i].alive = 0;
-				}
-				
-				break;
+			
+			//find car by id
+			srcCar = findCarById(data.id);
+			
+			//if the car is under collision effect, don't do a thing - don't update position etc.
+			if(!srcCar){
+				console.log("car not found in position handler!");
+				return;
+			} 
+			
+			//car is dead - no positin update is needed
+			if(srcCar.alive == 0){
+				console.log("car is dead - no position update");
+				return;
+			} 
+			
+			//car in the middle of collision event, skip position update
+			if(srcCar.collided == 1){
+				console.log("collided car won't update position until next round!");
+				return;
+			} 
+			
+			/* var prevCollision = 0; //collisin in previous round
+			if(srcCar.prevCollided == 1){ 
+				prevCollision = 1;
 			}
-		}
-		//console.log("*******************************");
-		//console.log("client: "+data.id+ " position updated: ("+data.x +", "+data.y+")");
-		//socket.emit('position', "no clash"); 	
+			srcCar.prevCollided =0; //reset paramter */
+			
+			//save previous paramters of the car
+			srcCar.prev_x = srcCar.x;
+			srcCar.prev_y = srcCar.y;
+			srcCar.prevOrientation = srcCar.orientation;
+			
+
+			//update the current paramters of the car
+			srcCar.prev_x = srcCar.x;
+			srcCar.x = data.x;
+			srcCar.y = data.y;
+			srcCar.orientation = data.orientation;
+			
+			//car travelled too big a distance between two consective location upates
+			/* if( (Math.pow( srcCar.x - srcCar.prev_x, 2) + Math.pow( srcCar.y - srcCar.prev_y, 2))  >  
+				Math.pow(4*srcCar.speed, 2) ){
+					
+				if(prevCollision){ //if the car wasn't thrown around because of a collisin effect
+					//the cheat detected - radical change in location between two position updates
+					//throw car back to latest valid location and orientation
+					srcCar.x = srcCar.prev_x;
+					srcCar.y = srcCar.prev_y;
+					srcCar.orientation = srcCar.prevOrientation;
+					console.log("position cheat detected");
+				}
+			} */
+			
+			
+		/* 	if(Math.abs(srcCar.prevOrientation - srcCar.orientation) > 4*srcCar.rotateUnit){
+				if(prevCollision){
+				//cheat detected
+				//throw car back to latest valid location and orientation
+				
+				srcCar.x = srcCar.prev_x;
+				srcCar.y = srcCar.prev_y;
+				srcCar.orientation = srcCar.prevOrientation;
+				console.log("orientation cheat detected");
+				}
+			}	
+			 */
+			if(data.x > map_width || data.x < 0 || data.y > map_height || data.y < 0){//out of bounds, dead
+				cars[i].alive = 0;
+			}
+			
+			
+			/* for(i = 0; i < cars.length; i++){
+				if(cars[i].id == socket.id){ //found car
+					if(cars[i].collided == 0){
+						cars[i].prev_x = cars[i].x;
+						cars[i].prev_y = cars[i].y;
+						//cars[i].prev_stamp = cars[i].cur_stamp;
+
+						cars[i].x = data.x;
+						cars[i].y = data.y;
+						cars[i].orientation = data.orientation;
+						
+						if(data.x > map_width || data.x < 0 || data.y > map_height || data.y < 0){//out of bounds, dead
+							cars[i].alive = 0;
+						}
+						
+						break;
+					}
+				} 
+			}*/
 	});
 	
 	
@@ -235,17 +313,19 @@ io.on('connection', function(socket){
 	socket.on('powerUp', function(srcCarData){
 		console.log('potential powerup event');
 		
-		//find the car object for the car the sent the collision event
-		var srcCar = findCarById(srcCarData.id);
 		
 		//save current power up time stamp to previous
-		srcCar.prevPUPStamp = srcCar.curPUPStamp;
+		//srcCar.prevPUPStamp = srcCar.curPUPStamp;
 			
 		//record time stamp of this power up notification
-		srcCar.curPUPStamp = Date.now();
+		//srcCar.curPUPStamp = Date.now();
 		
 		//if the two collision are too close - within 50ms, ignore the second one
-		if(srcCar.curPUPStamp - srcCar.prevPUPStamp > 50){ //proceed to process the power up request
+		//if(srcCar.curPUPStamp - srcCar.prevPUPStamp > 50){ //proceed to process the power up request
+			
+			//find the car object for the car the sent the collision event
+			var srcCar = findCarById(srcCarData.id);
+		
 			
 			//check to see if the car has indeed consumed a power and if it has, set the powerUp field
 			//to the type of the power - a number - and mark the powerUP object as consumed
@@ -288,7 +368,7 @@ io.on('connection', function(socket){
 				srcCar.pUp3TimerStart = Math.floor(Date.now() / 1000); 
 			}
 
-		}
+		
 	}); 
 	
 		/*
@@ -297,49 +377,75 @@ io.on('connection', function(socket){
 	*/
 	 socket.on('collision', function(srcCarData){
 		console.log('potential collision event');
-			
-		//find the car object for the car the sent the collision event
-		var srcCar = findCarById(srcCarData.id);
 		
 		//save previous collision time stamp
-		srcCar.prevCollisionStamp = srcCar.curCollisionStamp;
+		//srcCar.prevCollisionStamp = srcCar.curCollisionStamp;
 			
 		//record time stamp of this collision
-		srcCar.curCollisionStamp = Date.now();
+		//srcCar.curCollisionStamp = Date.now();
 		
 		//if the two collision are too close - within 50ms, ignore the second one
-		if(srcCar.curCollisionStamp - srcCar.prevCollisionStamp > 50){ //proceed to process collision
+		//if(srcCar.curCollisionStamp - srcCar.prevCollisionStamp > 50){ //proceed to process collision
+			
+			
+			//find the car object for the car the sent the collision event
+			var srcCar = findCarById(srcCarData.id);
+			if(!srcCar){
+				console.log('in on collision - srcCAr not found ');
+				return;
+			}
+			
+			if(srcCar.collided == 1){//car under collisoin effect
+				console.log('in on collision - srcCAr under existing collision');
+				return;
+				
+			}
 			
 			//next find the target car the collided with srcCar
-			var trgtCar = detectCollision(srcCar);
+			//var trgtCar = detectCollision(srcCar);
 			
-			if (trgtCar) { //if collision confirmed - trgtCar isn't null
-				
-				srcCar.collided = 1;
-				trgtCar.collided = 1;
-				
-				//handle collision event - update orientation and lcoation of both collided cars:
-				newTrgtCarOrientation = srcCar.orientation;
-				newSrcCarOrientation = trgtCar.orientation;
-				var diffInOrientation = Math.abs(srcCar.orientation - trgtCar.orientation);
-				if(diffInOrientation > 90){ //too radical the difference in orientation`
-					newSrcCarOrientation = trgtCar.orientation+((srcCar.orientation - trgtCar.orientation) % 90);
-					newTrgtCarOrientation = srcCar.orientation+((trgtCar.orientation - srcCar.orientation) % 90);
-					
-				}
-				
-				//updated orientation and position of srcCar - position is 100 pixels ahead along the new orientation
-				srcCar.orientation = newSrcCarOrientation;
-				srcCar.x = srcCar.x + (Math.sin(toRadians(srcCar.orientation))*100);
-				srcCar.y = srcCar.y - (Math.cos(toRadians(srcCar.orientation))*100);
-				
-				//updated orientation and position of trgCar - position is 100 pixels ahead along the new orientation
-				trgtCar.orientation = newTrgtCarOrientation;	
-				trgtCar.x= trgtCar.x + (Math.sin(toRadians(trgtCar.orientation))*100);
-				trgtCar.y= trgtCar.y - (Math.cos(toRadians(trgtCar.orientation))*100);
+			var trgtCar = findCarById(srcCarData.trgetid);
+			
+			if (!trgtCar) {
+				console.log('in on collision - trgtCar not found ');
+				return
 			}
-		
-		}
+
+			if(trgtCar.collided == 1){//car under collisoin effect
+				console.log('in on collision - trgtCar under existing collision');
+				return;
+			}
+			
+			if(srcCar.alive == 0 || trgtCar.alive == 0){ //if either car is dead
+				console.log('in on collision - one of the cars is already dead');
+				return;
+			}
+			
+			//at this point the collision is confirmed collision confirmed - trgtCar isn't null
+			srcCar.collided = 1;
+			trgtCar.collided = 1;
+			
+			
+			//handle collision event - update orientation and lcoation of both collided cars:
+			newTrgtCarOrientation = srcCar.orientation;
+			newSrcCarOrientation = trgtCar.orientation;
+
+			//updated orientation and position of srcCar - position is 100 pixels ahead along the new orientation
+			srcCar.orientation = newSrcCarOrientation;
+			srcCar.x = srcCar.x + (srcCar.x-trgtCar.x);
+			srcCar.y = srcCar.y - (srcCar.y-trgtCar.y);
+			srcCar.prev_x = srcCar.x;
+			srcCar.prev_y = srcCar.y;
+			
+			//updated orientation and position of trgCar - position is 100 pixels ahead along the new orientation
+			trgtCar.orientation = newTrgtCarOrientation;
+			trgtCar.x= trgtCar.x + (trgtCar.x-srcCar.x);
+			trgtCar.y= trgtCar.y - (trgtCar.y-srcCar.y);
+			trgtCar.prev_x = trgtCar.x;
+			trgtCar.prev_y = trgtCar.y;
+			
+			console.log('collision handled');
+				
 	}); 
 		
 	
@@ -348,80 +454,61 @@ io.on('connection', function(socket){
 	car pop event comes from client. Verify pop and update parameters accordingly.
 	*/
 	socket.on('pop', function(srcCarData){
-		//console.log('collision event');
-		//find the car object for the car the sent the collision event
+		console.log(' portential pop event');
+		//find the car object for the car the sent the pop notification
 		var srcCar = findCarById(srcCarData.id);
-			if((srcCar) && (srcCar.alive == 1)) {
-				var deadCar = detectPop(srcCar);
-				if ((deadCar) && (deadCar.alive == 1)) {
-					deadCar.alive = 0;
-					//increase car's speed by a percent of the killed cars speed plus base amount
-					srcCar.speed += (deadCar.speed - 10)*PERC_GAIN + BASE_GAIN;
-					if (srcCar.speed > MAX_SPEED) srcCar.speed = MAX_SPEED;
-					srcCar.score++;
-					
-					//Update leaderboard
-					updateLeaderboard();
-			}
+		var trgtCar = findCarById(srcCarData.trgtid);
+		
+		if(!srcCar){
+			console.log("in pop - srcCar not found");
+			return;
 		}
 		
+		if(!trgtCar){
+			console.log("in pop - trgtCar not found");
+			return;
+		}
+		
+		trgtCar.alive = 0; //mark trgtCar as dead
+		console.log('pop event handled!');
+		//increase srcCar's speed by a percent of the killed cars speed plus base amount
+		srcCar.speed += (trgtCar.speed - 10)*PERC_GAIN + BASE_GAIN;
+		if (srcCar.speed > MAX_SPEED){ srcCar.speed = MAX_SPEED;}
+		srcCar.score++;
+		
+			/* if((srcCar) && (srcCar.alive == 1)) {//if car exists and is alive
+				console.log(' got source car');
+				var deadCar = detectPop(srcCar); //get popped car
+
+				if (deadCar){
+					
+					deadCar.alive = 0;
+	
+					//increase car's speed by a percent of the killed cars speed plus base amount
+					srcCar.speed += (deadCar.speed - 10)*PERC_GAIN + BASE_GAIN;
+					if (srcCar.speed > MAX_SPEED){ srcCar.speed = MAX_SPEED;}
+					srcCar.score++;
+					
+					
+					
+				}
+			} */
 	});
 
 });
 
-function readTextFile(file)
-{
-    var rawFile = new XMLHttpRequest();
-    rawFile.open("GET", file, false);
-    rawFile.onreadystatechange = function ()
-    {
-        if(rawFile.readyState === 4)
-        {
-            if(rawFile.status === 200 || rawFile.status == 0)
-            {
-                var allText = rawFile.responseText;
-                return allText;
-            }
-        }
-    }
-    rawFile.send(null);
-}
-
 function compare(a,b) {
-  if (a.score > b.score)
-    return -1;
   if (a.score < b.score)
+    return -1;
+  if (a.score > b.score)
     return 1;
   return 0;
 }
 
 function updateLeaderboard(){
 	cars.sort(compare);
-	for(i=0; i<cars.length; i++) console.log(cars[i].score);
-    console.log("Done");
 }
 
-
-function detectPop(sprite){
-	for(i = 0; i < cars.length; i++){
-			//compute the locatoin of the tip of the needle and the center of the balloon for the two cars
-			//the tip of the needle is 50 pixels left of the center and the center of the balloon is 50 pixels right of
-			//the car center. Do this for each car: 
-			
-			balloonx = cars[i].x - (Math.sin(toRadians(cars[i].orientation))*100);
-			balloony = cars[i].y + (Math.cos(toRadians(cars[i].orientation))*100);
-
-			tipx = sprite.x + (Math.sin(toRadians(sprite.orientation))*100);
-			tipy = sprite.y - (Math.cos(toRadians(sprite.orientation))*100);
-			
-			//if the distance between the ballon of cars[i] and the tip of cars[j] is less than radius = 50
-			if( (Math.pow( balloonx - tipx, 2) + Math.pow( balloony - tipy, 2))  < Math.pow(50,2)  ){
-					return cars[i];
-			}
-			
-	}
-	return null;
-}
 
 /*
 finds car by id
@@ -432,6 +519,7 @@ function findCarById(carId){
 				return cars[i];
   		}
 	}
+	return null;
 }
 
 /*
@@ -475,25 +563,9 @@ function generateSpawnLoc(){
 
 
 //listen on port 3000 - can change the port later 
-http.listen(2999, '0.0.0.0', function(){
-  console.log('listening on *:2999');
+http.listen(3000, '0.0.0.0', function(){
+  console.log('listening on *:3000');
 });
-
-
-
-
-/*
-finds car by id
-*/
-function findCarById(carId){
-	for(i = 0; i < cars.length; i++){
-			if(cars[i].id == carId){
-				return cars[i];
-  		}
-	}
-	return null;
-}
-
 
 
 /*
@@ -513,12 +585,13 @@ function detectPop(sprite){
 			tipy = sprite.y - (Math.cos(toRadians(sprite.orientation))*100);
 			
 			//if the distance between the ballon of cars[i] and the tip of cars[j] is less than radius = 50
-			if( (Math.pow( balloonx - tipx, 2) + Math.pow( balloony - tipy, 2))  < Math.pow(50,2)  ){
-					return cars[i];
-			}
-			
+			if( (Math.pow( balloonx - tipx, 2) + Math.pow( balloony - tipy, 2))  < Math.pow(75,2)  ){
+					console.log("returning popped car");
+					return cars[i];	
+			}	
 	}
-	return null;
+	console.log("popped car not found!");
+	return null;	
 }
 
 
@@ -629,7 +702,7 @@ function updateClients(){
 	
 	removeConsumedPowerUps(); //consumed power ups get removed
 	
-	checkCarpUps(); //reset power ups - for expired power ups before broadcasting
+	checkCarpUps(); //clear power ups - for expired power ups before broadcasting
 	
 	//time to refill all type 1 power ups? - 60 seconds have passed since last time? 
 	if(Math.floor(Date.now() / 1000) - Type1Pup > 60){
@@ -661,7 +734,7 @@ function updateClients(){
 
 	
 	//time to refill all type 3 power ups? - 120 seconds have passed since last time? 
-	if(Math.floor(Date.now() / 1000) - Type2Pup > 120){
+	if(Math.floor(Date.now() / 1000) - Type3Pup > 120){
 		Type3Pup = Math.floor(Date.now() / 1000);
 		//first remove all existing type 3 power ups from the powerUps list
 		for(i = 0; i < powerUps.length; i++){
@@ -673,15 +746,15 @@ function updateClients(){
 		generateType3Pups();
 	}	
 		
-	
+	//Update leaderboard
+	updateLeaderboard();
 	
 	//broadcast all cars and power ups information to the clients
 	io.emit('update', {cars:cars, powerUps:powerUps});
 	
 	//called after broadcast to reset collision flags of cars
-	clearCollisionFlags(); 
-	
-	}
+	clearCollisionFlags();
+}
 	
 
 	
@@ -696,22 +769,11 @@ This function is called after a broadcast
 function clearCollisionFlags(){
 	
 	for(i = 0; i < cars.length; i++){
-		cars[i].collided = 0;
+		if(cars[i].collided == 1){
+			cars[i].prevCollided =1;
+			cars[i].collided = 0;
+		}
 	}	
-}
-
-
-/*
-removes all cars in the cars list that marked dead, i.e car.alive = 0
-*/
-function removeDeadCars(){
-	
-	for(i = 0; i < cars.length; i++){
-		if(cars[i].alive == 0){
-			cars.splice(i, 1);
-	  }
-	}
-	
 }
 
 
@@ -798,39 +860,6 @@ function removeConsumedPowerUps(){
 	}
 	
 }
-
-/*
-generate a random location on the map to place a new player. 
-returns the lcoation as an object {x:x, y:y}
-*/
-function generateRandomLoc() {
-  var x = Math.floor(Math.random()*4500)+250;
-	var y = Math.floor(Math.random()*4500)+250;
-  return {x:x, y:y};
-}
-
-//generate random position
-function generateSpawnLoc(){
-	var loc = generateRandomLoc();
-
-  // check that all cars aren't to close to the new spawn point
-  // This is a conditional loop not a counted loop
-  for(i = 0; i < cars.length; i++){
-			if(cars[i].x + 250 > loc.x) continue;
-      if(cars[i].x - 350 < loc.x) continue;
-      if(cars[i].y + 350 > loc.y) continue;
-      if(cars[i].y - 350 < loc.y) continue;   
-			
-      // Too close to a car, resart the loop with new location
-      loc = generateRandomLoc();
-      i = 0;  		
-  	}
-    
-  var orientation = Math.floor(Math.random()*360);
-	return {x:loc.x, y:loc.y, orientation:orientation};
-}
-
-
 
 /* checks if a a cars power up is expired and resets the corresponding car paramters*/
 function checkCarpUps(){

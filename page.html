@@ -163,7 +163,7 @@ border: 2px solid black;
 			text-align:center;
         }
         .login {
-		color:white;
+		color:white;	  
             position: absolute; /* or absolute */
 			padding:0;
 		width:400px;
@@ -293,7 +293,7 @@ font-size: 50px;
 
 #finalScore{
 width: 100%;
-}
+} 
 </style>
 <script src="/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="js/jquery-1.11.2.js"></script>
@@ -309,7 +309,7 @@ width: 100%;
 	<div id="splashscreen" class="overlay">
         <div class="login">
             <h1 class="title">RC POP</h1>
-			<div id="finalScore"></div>
+			<div id="finalScore"></div>				  
 			<br/><br/>
                 <input type="text" id="u" class="input" placeholder="Username" autofocus>
 				<br/><br/>
@@ -846,14 +846,44 @@ function detectPop(){
 			
 			//if the distance between the ballon of cars[i] and the tip of cars[j] is less than radius = 50
 			if( Math.sqrt(Math.pow( balloonx - tipx, 2) + Math.pow( balloony - tipy, 2))  < 45  ){
-					return true;
+					return otherCars[i].id;
 			}
 			
 	}
-	return false;
+	return null;
 }
 
 
+
+function detectCollision(){
+	for(i = 0; i < otherCars.length; i++){
+			if(otherCars[i].id != id){
+				
+				//compute coordinates of tips of both cars
+				tipx = sprite.x + (Math.sin(toRadians(sprite.orientation))*100);
+				tipy = sprite.y - (Math.cos(toRadians(sprite.orientation))*100);
+				
+				//check distance between tip and center of cars pairwise for collisions
+				if( (Math.pow( tipx - otherCars[i].car.x, 2) + Math.pow( tipy - otherCars[i].car.y, 2))  <  Math.pow(50, 2) ){
+						return otherCars[i].id;
+					
+				}
+				
+				//check distance between the centers of the two cars for collisions
+				if( (Math.pow( otherCars[i].car.x - sprite.x, 2) + Math.pow( otherCars[i].car.y - sprite.y, 2))  <  Math.pow(100, 2) ){
+						return otherCars[i].id;
+					
+				}
+				
+				// we can do another check here to see if the two needles intersect
+				//to do this we need to use the parametric equations of both line segments and find common
+				//solution for the parametric equations. Not doable / too much work using javascript
+				//so for now ignore needle collision		
+			}
+		}
+		
+		return null;	
+}
 
 
 
@@ -958,11 +988,18 @@ for(i = 0; i < otherCars.length; i++) {
 }
 
 
-socket.emit("position", {x:sprite.x, y:sprite.y, orientation:sprite.orientation});
+socket.emit("position", {x:sprite.x, y:sprite.y, id:id, orientation:sprite.orientation});
 
 //check collision
-if(detectPop()){
-socket.emit("pop", {id:id});
+var othercr = detectCollision();
+if(othercr){//if not null
+socket.emit("collision", {id:id, trgetid:othercr});
+}
+
+//check pop
+var otherId = detectPop();
+if(otherId){ //not null
+socket.emit("pop", {id:id, trgtid:otherId});
 }
 
 
@@ -1091,6 +1128,8 @@ socket.on('update', function(lists) {
 if(gameState == 0){
 	return;
 }
+
+
 lboard = "Scoreboard<br/>";
 
 //Update Leaderboard
@@ -1112,7 +1151,17 @@ var still_alive = 0;
     if (updatingCar.id == id) {
       //console.log(id);
       //sprite.setPos(updatingCar.x, updatingCar.y);
-	  sprite.setScore(updatingCar.score);
+
+	
+	//check collision adjustment
+	if(updatingCar.collided == 1){
+		
+		sprite.setPos(updatingCar.x,updatingCar.y);
+		sprite.orientation = updatingCar.orientation;
+
+	}
+
+      sprite.setScore(updatingCar.score);
       sprite.setSpeed(updatingCar.speed);
       still_alive = 1;
       continue;
@@ -1124,6 +1173,12 @@ var still_alive = 0;
       //console.log("listCar: "+updatingCar.id + " CarID:" + otherCars[j].id);
       // update it's values if it is
       if(updatingCar.id == otherCars[j].id) {
+	
+	//check collision adjustment
+	if(updatingCar.collided == 1){
+		otherCars[j].car.setPos(updatingCar.x,updatingCar.y);
+		otherCars[j].car.orientation = updatingCar.orientation;
+	}
 
         otherCars[j].car.setTargetPos(updatingCar.x, updatingCar.y);
         otherCars[j].car.setSpeed(updatingCar.speed);
@@ -1151,7 +1206,7 @@ var still_alive = 0;
 
 if(still_alive == 0){
 	gameState = 0;
-	$("#finalScore").html("You scored: "+sprite.score);
+	$("#finalScore").html("You scored: "+sprite.score);												
 	$("#splashscreen").fadeIn(500);
 	
 }
