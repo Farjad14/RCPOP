@@ -228,16 +228,27 @@ io.on('connection', function(socket){
 			} 
 			
 			//car in the middle of collision event, skip position update
-			if(srcCar.collided == 1){
+			/* if(srcCar.collided == 1){
 				console.log("collided car won't update position until next round!");
 				return;
-			} 
+			} */ 
 			
 			/* var prevCollision = 0; //collisin in previous round
 			if(srcCar.prevCollided == 1){ 
 				prevCollision = 1;
 			}
 			srcCar.prevCollided =0; //reset paramter */
+			
+			
+			
+			//car travelled too big a distance between two consective location upates
+			 if( (Math.pow( srcCar.x - data.x, 2) + Math.pow( srcCar.y - data.y, 2))  >  
+				Math.pow(6*srcCar.speed, 2) ){
+				//position update cheat!
+				console.log('cheat position update');
+				return;
+				
+			} 
 			
 			//save previous paramters of the car
 			srcCar.prev_x = srcCar.x;
@@ -246,26 +257,10 @@ io.on('connection', function(socket){
 			
 
 			//update the current paramters of the car
-			srcCar.prev_x = srcCar.x;
 			srcCar.x = data.x;
 			srcCar.y = data.y;
 			srcCar.orientation = data.orientation;
-			
-			//car travelled too big a distance between two consective location upates
-			/* if( (Math.pow( srcCar.x - srcCar.prev_x, 2) + Math.pow( srcCar.y - srcCar.prev_y, 2))  >  
-				Math.pow(4*srcCar.speed, 2) ){
-					
-				if(prevCollision){ //if the car wasn't thrown around because of a collisin effect
-					//the cheat detected - radical change in location between two position updates
-					//throw car back to latest valid location and orientation
-					srcCar.x = srcCar.prev_x;
-					srcCar.y = srcCar.prev_y;
-					srcCar.orientation = srcCar.prevOrientation;
-					console.log("position cheat detected");
-				}
-			} */
-			
-			
+			//console.log("position update successfully");
 		/* 	if(Math.abs(srcCar.prevOrientation - srcCar.orientation) > 4*srcCar.rotateUnit){
 				if(prevCollision){
 				//cheat detected
@@ -303,6 +298,7 @@ io.on('connection', function(socket){
 				} 
 			}*/
 	});
+	
 	
 	
 	/*
@@ -371,6 +367,7 @@ io.on('connection', function(socket){
 		
 	}); 
 	
+	
 		/*
 	srcCar sends a collision message to server. 
 	srcCarData contains the car x and y positions as well as the car id
@@ -395,26 +392,26 @@ io.on('connection', function(socket){
 				return;
 			}
 			
-			if(srcCar.collided == 1){//car under collisoin effect
+			/* if(srcCar.collided == 1){//car under collisoin effect
 				console.log('in on collision - srcCAr under existing collision');
 				return;
 				
-			}
+			} */
 			
 			//next find the target car the collided with srcCar
-			//var trgtCar = detectCollision(srcCar);
+			var trgtCar = detectCollision(srcCar);
 			
-			var trgtCar = findCarById(srcCarData.trgetid);
+			//var trgtCar = findCarById(srcCarData.trgetid);
 			
 			if (!trgtCar) {
 				console.log('in on collision - trgtCar not found ');
-				return
-			}
-
-			if(trgtCar.collided == 1){//car under collisoin effect
-				console.log('in on collision - trgtCar under existing collision');
 				return;
 			}
+
+			// if(trgtCar.collided == 1){//car under collisoin effect
+				// console.log('in on collision - trgtCar under existing collision');
+				// return;
+			// }
 			
 			if(srcCar.alive == 0 || trgtCar.alive == 0){ //if either car is dead
 				console.log('in on collision - one of the cars is already dead');
@@ -457,26 +454,30 @@ io.on('connection', function(socket){
 		console.log(' portential pop event');
 		//find the car object for the car the sent the pop notification
 		var srcCar = findCarById(srcCarData.id);
-		var trgtCar = findCarById(srcCarData.trgtid);
 		
 		if(!srcCar){
 			console.log("in pop - srcCar not found");
 			return;
 		}
 		
+		//var trgtCar = findCarById(srcCarData.trgtid);
+		//var trgtCar = detectCollision(srcCar);
+		
+		
 		if(!trgtCar){
 			console.log("in pop - trgtCar not found");
 			return;
 		}
-		
+		/*
 		trgtCar.alive = 0; //mark trgtCar as dead
 		console.log('pop event handled!');
 		//increase srcCar's speed by a percent of the killed cars speed plus base amount
 		srcCar.speed += (trgtCar.speed - 10)*PERC_GAIN + BASE_GAIN;
 		if (srcCar.speed > MAX_SPEED){ srcCar.speed = MAX_SPEED;}
 		srcCar.score++;
+		*/
 		
-			/* if((srcCar) && (srcCar.alive == 1)) {//if car exists and is alive
+			if(srcCar.alive == 1) {//if car exists and is alive
 				console.log(' got source car');
 				var deadCar = detectPop(srcCar); //get popped car
 
@@ -492,8 +493,10 @@ io.on('connection', function(socket){
 					
 					
 				}
-			} */
+			}
 	});
+	
+
 
 });
 
