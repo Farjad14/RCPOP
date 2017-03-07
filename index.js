@@ -98,6 +98,9 @@ powerUps = [];
 //a list that holds all cars on the map
 cars = [];
 
+//a list for dead cars that were popped in the current round -  30ms
+deadCars = [];
+
 
 //instantiate the express module and use it to build an http server. 
 var express = require('express');
@@ -149,8 +152,8 @@ io.on('connection', function(socket){
 	Make sure the nickname is valid - if not, return to client with an 'id' taggged message
 	*/
 	socket.on('new client', function(nickname){
-		if(nickname.length > 12){
-			console.log(nickname.length);
+		if(nickname.length > 12 || nickname.length == 0){
+			console.log('invalid length');
 			socket.emit("id", null);
 			return;
 		}
@@ -464,10 +467,10 @@ io.on('connection', function(socket){
 		//var trgtCar = detectCollision(srcCar);
 		
 		
-		if(!trgtCar){
+		/* if(!trgtCar){
 			console.log("in pop - trgtCar not found");
 			return;
-		}
+		} */
 		/*
 		trgtCar.alive = 0; //mark trgtCar as dead
 		console.log('pop event handled!');
@@ -480,7 +483,7 @@ io.on('connection', function(socket){
 			if(srcCar.alive == 1) {//if car exists and is alive
 				console.log(' got source car');
 				var deadCar = detectPop(srcCar); //get popped car
-
+				if(!deadCar) console.log(' deadCar not found!');
 				if (deadCar){
 					
 					deadCar.alive = 0;
@@ -532,6 +535,7 @@ function removeDeadCars(){
 	
 	for(i = 0; i < cars.length; i++){
 		if(cars[i].alive == 0){
+			deadCars.push(cars[i]);
 			cars.splice(i, 1);
 	  }
 	}
@@ -753,7 +757,8 @@ function updateClients(){
 	updateLeaderboard();
 	
 	//broadcast all cars and power ups information to the clients
-	io.emit('update', {cars:cars, powerUps:powerUps});
+	io.emit('update', {cars:cars, powerUps:powerUps, deadCars:deadCars});
+	deadCars = [];
 	
 	//called after broadcast to reset collision flags of cars
 	clearCollisionFlags();

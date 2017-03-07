@@ -302,6 +302,9 @@ width: 100%;
 <script type="text/javascript" src="js/jquery-1.11.2.js"></script>
 </head>
 <body>
+<audio id="popped" hidden="true">
+  <source src="assets/popped.mp3" type="audio/mpeg">
+</audio>
 <div id="fps_log"></div>
 <div id="container">
 <div id="stage">
@@ -1214,27 +1217,37 @@ if(still_alive == 0){
 	
 }
 
+//check dead by pop
+//for(i = 0; i < lists.deadCars.length; i++) {
+	//if (Math.abs(deadCars.x - sprite.x) > )
+	if (lists.deadCars.length>0) {
+	console.log('length of deadCars list: '+lists.deadCars.length);
+	$("#popped").get(0).play();
+	console.log("audio played");
+	}
+//}
+
 //check dead
 for(i = 0; i < otherCars.length; i++) {
 
-var found = false;
-for(j = 0; j < lists.cars.length; j++){
+	var found = false;
+	for(j = 0; j < lists.cars.length; j++){
 
-	if(otherCars[i].id == lists.cars[j].id){
-		found = true;
-		break;
+		if(otherCars[i].id == lists.cars[j].id){
+			found = true;
+			break;
+		}
+
 	}
 
-}
+	if(!found){//if not found remove from dom
+		otherCars[i].car.sprite.remove();
+		otherCars.splice(i,1);
+		mini_otherCars[i].remove();
+		mini_otherCars.splice(i,1);
+	}
 
-if(!found){//if not found remove from dom
-	otherCars[i].car.sprite.remove();
-	otherCars.splice(i,1);
-	mini_otherCars[i].remove();
-	mini_otherCars.splice(i,1);
-}
-
-}
+	}
 
 
 
