@@ -480,23 +480,19 @@ io.on('connection', function(socket){
 		srcCar.score++;
 		*/
 		
-			if(srcCar.alive == 1) {//if car exists and is alive
-				console.log(' got source car');
-				var deadCar = detectPop(srcCar); //get popped car
-				if(!deadCar) console.log(' deadCar not found!');
-				if (deadCar){
-					
-					deadCar.alive = 0;
-	
-					//increase car's speed by a percent of the killed cars speed plus base amount
-					srcCar.speed += (deadCar.speed - 10)*PERC_GAIN + BASE_GAIN;
-					if (srcCar.speed > MAX_SPEED){ srcCar.speed = MAX_SPEED;}
-					srcCar.score++;
-					
-					
-					
-				}
-			}
+		if(srcCar.alive == 1) {//if car exists and is alive
+			console.log(' got source car');
+			var deadCar = detectPop(srcCar); //get popped car
+			if(!deadCar) {
+				console.log(' deadCar not found!');
+			}	
+			deadCar.alive = 0;
+
+			//increase car's speed by a percent of the killed cars speed plus base amount
+			srcCar.speed += (deadCar.speed - 10)*PERC_GAIN + BASE_GAIN;
+			if (srcCar.speed > MAX_SPEED){ srcCar.speed = MAX_SPEED;}
+			srcCar.score++;
+		}
 	});
 	
 
