@@ -845,11 +845,12 @@ socket.on('update', function(lists) {
                     powerUpImages[i].css("top", powerUps[i].y + "px");
                 }
             } else if ((powerUps[i].x != lists.powerUps[i].x) || (powerUps[i].y != lists.powerUps[i].y)) {
-                //console.log("removing power up");
+                console.log("removing power up");
                 // The power up position doesn't match so remove it
-                /*powerUps.splice(i, 1);
+                powerUps.splice(i, 1);
                 powerUpImages[i].remove();
-                powerUpImages.splice(i, 1);*/
+                powerUpImages.splice(i, 1);
+                i--;
             }
         }
 
