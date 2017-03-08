@@ -786,6 +786,7 @@
                 var id;
                 var otherCars = [];
                 var powerUps = [];
+                var powerUpImages = [];
                 //init end
 
 
@@ -847,25 +848,6 @@
                 }
 
 
-                function renderPowerUps() {
-                    for(i = 0; i < powerUps.length; i++) {
-                      if (powerUps[i].type == 1) {
-                         $('<div class="powerUp">PowerUp1</div>').appendTo("#map");
-                         $(".powerUp").css("left", powerUps[i].x + "px");
-                         $(".powerUp").css("top", powerUps[i].x + "px");
-                      
-                      } else if (powerUps[i].type == 2) {
-                         $('<div class="powerUp">PowerUp1</div>').appendTo("#map");
-                         $(".powerUp").css("left", powerUps[i].x + "px");
-                         $(".powerUp").css("top", powerUps[i].x + "px");
-                      } else if (powerUps[i].type == 3) {
-                         $('<div class="powerUp">PowerUp1</div>').appendTo("#map");
-                         $(".powerUp").css("left", powerUps[i].x + "px");
-                         $(".powerUp").css("top", powerUps[i].x + "px");
-                      }
-                    }
-                
-                }
 
                 //game loop
                 /////////////////////
@@ -962,8 +944,6 @@
                                         top: (otherCars[i].car.y / (5000 / 150)) + "px"
                                     });
                                 }
-
-                                renderPowerUps();
 
                                 socket.emit("position", {
                                     x: sprite.x,
@@ -1177,10 +1157,34 @@
                         // check all the power ups in the power up list
                         for (i = 0; i < lists.powerUps.length; i++) {
                           if (powerUps.length <= i) { // if the list doesn't include that power up add it
+                              console.log("Appending power up");
                               powerUps.push(lists.powerUps[i]);
+                              console.log(powerUps[i].x + ", " + powerUps[i].y);
+                              if (powerUps[i].type == 1) {
+                                  powerUpImages.push($('<div class="powerUp">PowerUp1</div>'));
+                                  powerUpImages[i].appendTo("#map");
+                                  powerUpImages[i].css("left", powerUps[i].x + "px");
+                                  powerUpImages[i].css("top", powerUps[i].x + "px");
+                                  
+                              
+                              } else if (powerUps[i].type == 2) {
+                                  
+                                  powerUpImages.push($('<div class="powerUp">PowerUp2</div>'));
+                                  powerUpImages[i].appendTo("#map");
+                                  powerUpImages[i].css("left", powerUps[i].x + "px");
+                                  powerUpImages[i].css("top", powerUps[i].x + "px");
+                                 
+                              } else if (powerUps[i].type == 3) {
+                                  powerUpImages.push($('<div class="powerUp">PowerUp3</div>'));
+                                  powerUpImages[i].appendTo("#map");
+                                  powerUpImages[i].css("left", powerUps[i].x + "px");
+                                  powerUpImages[i].css("top", powerUps[i].x + "px");
+                    }
                           } else if ((powerUps[i].x != lists.powerUps[i].x) || (powerUps[i].y != lists.powerUps[i].y)) {
+                            console.log("removing power up");
                             // The power up position doesn't match so remove it
                             powerUps.splice(i, 1);
+                            powerUpImages.splice(i, 1).remove();
                           }
                         }
 
