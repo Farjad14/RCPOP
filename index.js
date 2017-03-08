@@ -485,13 +485,14 @@ io.on('connection', function(socket){
 			var deadCar = detectPop(srcCar); //get popped car
 			if(!deadCar) {
 				console.log(' deadCar not found!');
-			}	
-			deadCar.alive = 0;
+			}	else {
+        deadCar.alive = 0;
 
-			//increase car's speed by a percent of the killed cars speed plus base amount
-			srcCar.speed += (deadCar.speed - 10)*PERC_GAIN + BASE_GAIN;
-			if (srcCar.speed > MAX_SPEED){ srcCar.speed = MAX_SPEED;}
-			srcCar.score++;
+        //increase car's speed by a percent of the killed cars speed plus base amount
+        srcCar.speed += (deadCar.speed - 10)*PERC_GAIN + BASE_GAIN;
+        if (srcCar.speed > MAX_SPEED){ srcCar.speed = MAX_SPEED;}
+        srcCar.score++;
+      }
 		}
 	});
 	
@@ -749,8 +750,6 @@ function updateClients(){
 		generateType3Pups();
 	}	
 		
-	//Update leaderboard
-	updateLeaderboard();
 	
 	//broadcast all cars and power ups information to the clients
 	io.emit('update', {cars:cars, powerUps:powerUps, deadCars:deadCars});
