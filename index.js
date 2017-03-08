@@ -486,7 +486,7 @@ io.on('connection', function(socket) {
             var deadCar = detectPop(srcCar); //get popped car
             if (!deadCar) {
                 console.log(' deadCar not found!');
-            } else {
+            } else if (deadCar.alive == 1){
                 deadCar.alive = 0;
 
                 //increase car's speed by a percent of the killed cars speed plus base amount
