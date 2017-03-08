@@ -711,7 +711,7 @@ socket.on('id', function(newCar) {
 
     //console.log(newCar);
     if (newCar == null) {
-        alert("username already taken, too long or blank!");
+        alert("------------------\nINVALID USERNAME\n------------------\n\n User names must be;\n - Between 1 to 11 characters long\n - Contain only alphanumeric characters\n - Not contain any offensive language");
         return;
     }
     // Set our players id
