@@ -1159,26 +1159,24 @@
                           if (powerUps.length <= i) { // if the list doesn't include that power up add it
                               console.log("Appending power up");
                               powerUps.push(lists.powerUps[i]);
-                              console.log(powerUps[i].x + ", " + powerUps[i].y);
                               if (powerUps[i].type == 1) {
                                   powerUpImages.push($('<div class="powerUp">PowerUp1</div>'));
                                   powerUpImages[i].appendTo("#map");
                                   powerUpImages[i].css("left", powerUps[i].x + "px");
-                                  powerUpImages[i].css("top", powerUps[i].x + "px");
+                                  powerUpImages[i].css("top", powerUps[i].y + "px");
                                   
                               
                               } else if (powerUps[i].type == 2) {
-                                  
                                   powerUpImages.push($('<div class="powerUp">PowerUp2</div>'));
                                   powerUpImages[i].appendTo("#map");
                                   powerUpImages[i].css("left", powerUps[i].x + "px");
-                                  powerUpImages[i].css("top", powerUps[i].x + "px");
+                                  powerUpImages[i].css("top", powerUps[i].y + "px");
                                  
                               } else if (powerUps[i].type == 3) {
                                   powerUpImages.push($('<div class="powerUp">PowerUp3</div>'));
                                   powerUpImages[i].appendTo("#map");
                                   powerUpImages[i].css("left", powerUps[i].x + "px");
-                                  powerUpImages[i].css("top", powerUps[i].x + "px");
+                                  powerUpImages[i].css("top", powerUps[i].y + "px");
                     }
                           } else if ((powerUps[i].x != lists.powerUps[i].x) || (powerUps[i].y != lists.powerUps[i].y)) {
                             console.log("removing power up");
@@ -1187,7 +1185,7 @@
                             powerUpImages.splice(i, 1).remove();
                           }
                         }
-
+                        
                         if (still_alive == 0) {
                             gameState = 0;
                             $("#finalScore").html("You scored: " + sprite.score);
