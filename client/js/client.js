@@ -826,20 +826,20 @@ socket.on('update', function(lists) {
                 console.log("Appending power up");
                 powerUps.push(lists.powerUps[i]);
                 if (powerUps[i].type == 1) {
-                    powerUpImages.push($('<div class="powerUp">PowerUp1</div>'));
+                    powerUpImages.push($('<div class="powerUp1"></div>'));
                     powerUpImages[i].appendTo("#map");
                     powerUpImages[i].css("left", powerUps[i].x + "px");
                     powerUpImages[i].css("top", powerUps[i].y + "px");
 
 
                 } else if (powerUps[i].type == 2) {
-                    powerUpImages.push($('<div class="powerUp">PowerUp2</div>'));
+                    powerUpImages.push($('<div class="powerUp2"></div>'));
                     powerUpImages[i].appendTo("#map");
                     powerUpImages[i].css("left", powerUps[i].x + "px");
                     powerUpImages[i].css("top", powerUps[i].y + "px");
 
                 } else if (powerUps[i].type == 3) {
-                    powerUpImages.push($('<div class="powerUp">PowerUp3</div>'));
+                    powerUpImages.push($('<div class="powerUp3"></div>'));
                     powerUpImages[i].appendTo("#map");
                     powerUpImages[i].css("left", powerUps[i].x + "px");
                     powerUpImages[i].css("top", powerUps[i].y + "px");

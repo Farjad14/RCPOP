@@ -85,10 +85,23 @@ div {
     //change origin of rotation
     //transform-origin: 50& 0%;
 }
-.powerUp {
-    width: 25px;
-    height: 25px;
-    background: red;
+
+.powerUp1 {
+    width: 100px;
+    height: 100px;
+    background-image: url("img/SpeedBoost.png");
+}
+
+.powerUp2 {
+    width: 100px;
+    height: 100px;
+    background-image: url("img/DecreaseRotation.png");
+}
+
+.powerUp3 {
+    width: 100px;
+    height: 100px;
+    background-image: url("img/Barrage.png");
 }
 
 .opponentCar {
