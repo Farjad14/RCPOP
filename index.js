@@ -158,10 +158,17 @@ io.on('connection', function(socket) {
             return;
         }
 
+        // Check for only Alpha-numeric characters
+        var expr = new RegExp("[^A-Za-z0-9]");
+        if (expr.test(nickname)) {
+            console.log("not Alpha-numeric");
+            socket.emit("id", null);
+            return;
+        }
         //Check for badname
         //var regex = readTextFile("http://104.233.105.99/list.txt");
-        regex = new RegExp(regex);
-        if (regex.test(nickname)) {
+        expr = new RegExp(regex);
+        if (expr.test(nickname)) {
             console.log("bad word");
             socket.emit("id", null);
             return;

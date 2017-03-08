@@ -1165,8 +1165,7 @@
                         for (i = 0; i < lists.powerUps.length; i++) {
                           if (powerUps.length <= i) { // if the list doesn't include that power up add it
                               powerUps.push(lists.powerUps[i]);
-                          }
-                          else if (powerUps[i].x != lists.powerUps[i].x) || (powerUps[i].y != lists.powerUps[i].y) {
+                          } else if ((powerUps[i].x != lists.powerUps[i].x) || (powerUps[i].y != lists.powerUps[i].y)) {
                             // The power up position doesn't match so remove it
                             powerUps.splice(i, 1);
                           }
@@ -1186,7 +1185,7 @@
                             console.log('length of deadCars list: ' + lists.deadCars.length);                          
                             var w = 640// Get the actual width/2 $("#stage").get(0).width;
                             var h = 340// Get the actual height/2 $("#stage").get(0).hieght;
-                            if (Math.abs(deadCars.x - sprite.x) > w) && (Math.abs(deadCars.y - sprite.y) > h) {
+                            if ((Math.abs(lists.deadCars[i].x - sprite.x) > w) && (Math.abs(lists.deadCars[i].y - sprite.y) > h)) {
                                 $("#popped").get(0).play();
                                 console.log("audio played");
                             }
