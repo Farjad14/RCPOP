@@ -27,8 +27,8 @@ const speed = 10; // 10 pixels per milliseconds.
 const map_width = 5000;
 const map_height = 5000;
 const PERC_GAIN = 1 / 4;
-const BASE_GAIN = 1;
-const MAX_SPEED = 18;
+const BASE_GAIN = 0.25;
+const MAX_SPEED = 16;
 const SPEEDPUP3 = 3;
 const SPEEDPUP1 = 3;
 
