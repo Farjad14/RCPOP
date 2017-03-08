@@ -632,7 +632,7 @@ function detectCarPowerupCollisions(srcCar) {
                 if ((Math.pow(srcCar.x - powerUps[j].x, 2) +
                         Math.pow(srcCar.y - powerUps[j].y, 2)) < Math.pow(100, 2)) {
                     //a power up of type 1 or 2 has been eaten/collided with srcCar
-
+                    console.log("Contact with power up type 1 or 2");
                     //removes effects of other power ups from scrCar
                     //if srcCAr has power up of type 1, clear it before adding the effects
                     //of the newly consumed power up
@@ -674,7 +674,7 @@ function detectCarPowerupCollisions(srcCar) {
                 //if car is within 350 pixels of this power up - it consumed it
                 if ((Math.pow(srcCar.x - powerUps[j].x, 2) +
                         Math.pow(srcCar.y - powerUps[j].y, 2)) < Math.pow(350, 2)) {
-
+                     console.log("Contact with power up type 3");
                     //remove effects of other powerUPs from scrCar, if they exist
                     //if srcCAr has power up of type 1, clear it
                     if (srcCar.powerUp == 1) { //the power down that should last for 10 seconds

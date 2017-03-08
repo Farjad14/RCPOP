@@ -853,7 +853,8 @@ socket.on('update', function(lists) {
                 i--;
             }
         }
-
+        if (lists.powerUps.length != powerUps.length) console.log("Power up list length mismatch");
+        
         if (still_alive == 0) {
             gameState = 0;
             $("#finalScore").html("You scored: " + sprite.score);
