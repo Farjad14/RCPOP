@@ -68,7 +68,6 @@
             width: 25px;
             height: 25px;
             background: red;
-            color: white;
         }
         
         .opponentCar {
@@ -150,13 +149,11 @@
         }
         
         #score {
-            color: white;
             bottom: 0;
             left: 0;
         }
         
         #leaderboard {
-            color: white;
             text-align: center;
             top: 0;
             right: 0;
@@ -253,7 +250,6 @@
         }
         
         .player_name {
-            color: white;
             position: absolute;
             transform: rotate(90deg);
             height: 20px;
