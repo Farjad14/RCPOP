@@ -69,6 +69,12 @@
             //change origin of rotation
             //transform-origin: 50& 0%;
         }
+        .powerUp {
+            width: 25px;
+            height: 25px;
+            background: red;
+            color: white;
+        }
         
         .opponentCar {
             display: block;
@@ -844,11 +850,18 @@
                 function renderPowerUps() {
                     for(i = 0; i < powerUps.length; i++) {
                       if (powerUps[i].type == 1) {
+                         $('<div class="powerUp">PowerUp1</div>').appendTo("#map");
+                         $(".powerUp").css("left", powerUps[i].x + "px");
+                         $(".powerUp").css("top", powerUps[i].x + "px");
                       
                       } else if (powerUps[i].type == 2) {
-                      
+                         $('<div class="powerUp">PowerUp1</div>').appendTo("#map");
+                         $(".powerUp").css("left", powerUps[i].x + "px");
+                         $(".powerUp").css("top", powerUps[i].x + "px");
                       } else if (powerUps[i].type == 3) {
-                      
+                         $('<div class="powerUp">PowerUp1</div>').appendTo("#map");
+                         $(".powerUp").css("left", powerUps[i].x + "px");
+                         $(".powerUp").css("top", powerUps[i].x + "px");
                       }
                     }
                 
