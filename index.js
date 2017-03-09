@@ -850,7 +850,7 @@ function updateClients() {
 
 
 
-setInterval(updateClients, 40); //should be 50
+setInterval(updateClients, 30); //should be 50
 
 
 
