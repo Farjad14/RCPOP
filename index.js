@@ -64,8 +64,7 @@ car = function(x, y, orientation) {
         collided: 0,
         speed: speed, //default speed
         score: 0,
-        pUp1TimerStart: 0,
-        pUp2TimerStart: 0,
+        pUpTimerStart: 0,
         alive: 1,
         tipx: 0,
         tipy: 0,
@@ -167,7 +166,7 @@ io.on('connection', function(socket) {
         }
         //Check for badname
         //var regex = readTextFile("http://104.233.105.99/list.txt");
-        expr = new RegExp(regex);
+        expr = new RegExp(regex, "i");
         if (expr.test(nickname)) {
             console.log("bad word");
             socket.emit("id", null);
@@ -244,13 +243,13 @@ io.on('connection', function(socket) {
 
         //car in the middle of collision event, skip position update
         /* if(srcCar.collided == 1){
-        	console.log("collided car won't update position until next round!");
-        	return;
+            console.log("collided car won't update position until next round!");
+            return;
         } */
 
         /* var prevCollision = 0; //collisin in previous round
         if(srcCar.prevCollided == 1){ 
-        	prevCollision = 1;
+            prevCollision = 1;
         }
         srcCar.prevCollided =0; //reset paramter */
 
@@ -276,41 +275,41 @@ io.on('connection', function(socket) {
         srcCar.y = data.y;
         srcCar.orientation = data.orientation;
         //console.log("position update successfully");
-        /* 	if(Math.abs(srcCar.prevOrientation - srcCar.orientation) > 4*srcCar.rotateUnit){
-        		if(prevCollision){
-        		//cheat detected
-        		//throw car back to latest valid location and orientation
-        		
-        		srcCar.x = srcCar.prev_x;
-        		srcCar.y = srcCar.prev_y;
-        		srcCar.orientation = srcCar.prevOrientation;
-        		console.log("orientation cheat detected");
-        		}
-        	}	
-        	 */
+        /*     if(Math.abs(srcCar.prevOrientation - srcCar.orientation) > 4*srcCar.rotateUnit){
+                if(prevCollision){
+                //cheat detected
+                //throw car back to latest valid location and orientation
+                
+                srcCar.x = srcCar.prev_x;
+                srcCar.y = srcCar.prev_y;
+                srcCar.orientation = srcCar.prevOrientation;
+                console.log("orientation cheat detected");
+                }
+            }    
+             */
         if (data.x > map_width || data.x < 0 || data.y > map_height || data.y < 0) { //out of bounds, dead
             cars[i].alive = 0;
         }
 
 
         /* for(i = 0; i < cars.length; i++){
-        	if(cars[i].id == socket.id){ //found car
-        		if(cars[i].collided == 0){
-        			cars[i].prev_x = cars[i].x;
-        			cars[i].prev_y = cars[i].y;
-        			//cars[i].prev_stamp = cars[i].cur_stamp;
+            if(cars[i].id == socket.id){ //found car
+                if(cars[i].collided == 0){
+                    cars[i].prev_x = cars[i].x;
+                    cars[i].prev_y = cars[i].y;
+                    //cars[i].prev_stamp = cars[i].cur_stamp;
 
-        			cars[i].x = data.x;
-        			cars[i].y = data.y;
-        			cars[i].orientation = data.orientation;
-        			
-        			if(data.x > map_width || data.x < 0 || data.y > map_height || data.y < 0){//out of bounds, dead
-        				cars[i].alive = 0;
-        			}
-        			
-        			break;
-        		}
-        	} 
+                    cars[i].x = data.x;
+                    cars[i].y = data.y;
+                    cars[i].orientation = data.orientation;
+                    
+                    if(data.x > map_width || data.x < 0 || data.y > map_height || data.y < 0){//out of bounds, dead
+                        cars[i].alive = 0;
+                    }
+                    
+                    break;
+                }
+            } 
         }*/
     });
 
@@ -341,28 +340,28 @@ io.on('connection', function(socket) {
         //check to see if the car has indeed consumed a power and if it has, set the powerUp field
         //to the type of the power - a number - and mark the powerUP object as consumed
         //detectCarPowerupCollisions(srcCar, srcCarData); //this function does all of the above
-		
-		ridPowerUp(srcCarData); // marks powerup as consumed =1
-		
-		//remove effect of previous power up from srcCar
-		removePupEffct(srcCar);
-		
-		//update power up flag as sent
-		if(srcCarData.type == 1) {srcCar.powerUp=1;}
-		if(srcCarData.type == 2) {srcCar.powerUp=2;}
-		if(srcCarData.type == 3) {srcCar.powerUp=3;}
-		
-		
+        
+        ridPowerUp(srcCarData); // marks powerup as consumed =1
+        
+        //remove effect of previous power up from srcCar
+        removePupEffct(srcCar);
+        
+        //update power up flag as sent
+        if(srcCarData.type == 1) {srcCar.powerUp=1;}
+        if(srcCarData.type == 2) {srcCar.powerUp=2;}
+        if(srcCarData.type == 3) {srcCar.powerUp=3;}
+        
+        
         if (srcCar.powerUp == 1) {
             //this is a power down
             srcCar.rotateUnit -= SPEEDPUP1; //-3
             //set start timer for power up
-            srcCar.pUp1TimerStart = Math.floor(Date.now() / 1000); //lasts for 10 seconds	
+            srcCar.pUpTimerStart = Math.floor(Date.now() / 1000); //lasts for 10 seconds    
             console.log('power up type 1 applied');
         } 
-		
-		else if (srcCar.powerUp == 3) {
-			 //we have only 1 of this power ups -  so this gotta be the special power up 
+        
+        else if (srcCar.powerUp == 3) {
+             //we have only 1 of this power ups -  so this gotta be the special power up 
            
             for (i = 0; i < cars.length; i++) {
                 if ((Math.pow(cars[i].x - srcCar.x, 2) + Math.pow(cars[i].y - srcCar.y, 2)) <
@@ -377,12 +376,12 @@ io.on('connection', function(socket) {
                     }
                     srcCar.score++;*/
                     
-                } 
+                }
             }
             console.log('power up type 3 applied');
         } 
-		
-		else if (srcCar.powerUp == 2) {
+        
+        else if (srcCar.powerUp == 2) {
         //we have 4 of this power up - once consumed, your car gains temporary speed 
  
         srcCar.speed += SPEEDPUP3; //+3
@@ -391,7 +390,7 @@ io.on('connection', function(socket) {
             
         }
         //this power up lasts for 6 seconds ******* set start timer
-        srcCar.pUp2TimerStart = Math.floor(Date.now() / 1000);
+        srcCar.pUpTimerStart = Math.floor(Date.now() / 1000);
         console.log('power up type 2 applied');
     }
 
@@ -400,9 +399,9 @@ io.on('connection', function(socket) {
 
 
     /*
-	srcCar sends a collision message to server. 
-	srcCarData contains the car x and y positions as well as the car id
-	*/
+    srcCar sends a collision message to server. 
+    srcCarData contains the car x and y positions as well as the car id
+    */
     socket.on('collision', function(srcCarData) {
         console.log('potential collision event');
 
@@ -424,9 +423,9 @@ io.on('connection', function(socket) {
         }
 
         /* if(srcCar.collided == 1){//car under collisoin effect
-        	console.log('in on collision - srcCAr under existing collision');
-        	return;
-        	
+            console.log('in on collision - srcCAr under existing collision');
+            return;
+            
         } */
 
         //next find the target car the collided with srcCar
@@ -496,8 +495,8 @@ io.on('connection', function(socket) {
 
 
         /* if(!trgtCar){
-        	console.log("in pop - trgtCar not found");
-        	return;
+            console.log("in pop - trgtCar not found");
+            return;
         } */
         /*
         trgtCar.alive = 0; //mark trgtCar as dead
@@ -531,30 +530,30 @@ io.on('connection', function(socket) {
 });
 
 function ridPowerUp(srcCarData){
-	for (i = 0; i < powerUps.length; i++) {
-		if (powerUps[i].x == srcCarData.x && powerUps[i].y == srcCarData.y 
-		&& powerUps[i].type == srcCarData.type ){
-			powerUps[i].consumed =1;
-		}
-	}
-	
+    for (i = 0; i < powerUps.length; i++) {
+        if (powerUps[i].x == srcCarData.x && powerUps[i].y == srcCarData.y 
+        && powerUps[i].type == srcCarData.type ){
+            powerUps[i].consumed =1;
+        }
+    }
+    
 }
 
 
 function ApplyPowerUps(){
-	
-for (i = 0; i < cars.length; i++) {	
-	
-	if (cars[i].powerUp == 1) {
+    
+for (i = 0; i < cars.length; i++) {    
+    
+    if (cars[i].powerUp == 1) {
             //this is a power down
             cars[i].rotateUnit -= SPEEDPUP1; //-3
             //set start timer for power up
-             cars[i].pUp1TimerStart = Math.floor(Date.now() / 1000); //lasts for 10 seconds	
-			 console.log('power up type 1 applied');
+             cars[i].pUpTimerStart = Math.floor(Date.now() / 1000); //lasts for 10 seconds    
+             console.log('power up type 1 applied');
         } 
-		
-		else if (cars[i].powerUp == 3) {
-			 //we have only 1 of this power ups -  so this gotta be the special power up 
+        
+        else if (cars[i].powerUp == 3) {
+             //we have only 1 of this power ups -  so this gotta be the special power up 
            
             for (j = 0; j < cars.length; j++) {
                 if ((Math.pow(cars[i].x - cars[j].x, 2) + Math.pow(cars[i].y - cars[j].y, 2)) <
@@ -562,10 +561,10 @@ for (i = 0; i < cars.length; i++) {
                     cars[j].alive = 0;
                 }
             }
-			console.log('power up type 3 applied');
+            console.log('power up type 3 applied');
         } 
-		
-		else if (cars[i].powerUp == 2) {
+        
+        else if (cars[i].powerUp == 2) {
             //we have 4 of this power up - once consumed, your car gains temporary speed 
      
             cars[i].speed += SPEEDPUP3; //+3
@@ -573,12 +572,12 @@ for (i = 0; i < cars.length; i++) {
                 cars[i].speed = MAX_SPEED;
             }
             //this power up lasts for 6 seconds ******* set start timer
-            cars[i].pUp2TimerStart = Math.floor(Date.now() / 1000);
-			console.log('power up type 2 applied');
+            cars[i].pUpTimerStart = Math.floor(Date.now() / 1000);
+            console.log('power up type 2 applied');
         }
-	
-	
-	}
+    
+    
+    }
 }
 
 function compare(a, b) {
@@ -607,29 +606,29 @@ function findCarById(carId) {
 }
 
 function removePupEffct(srcCar){
-	//removes effects of other power ups from cars[i]
-	if (srcCar.powerUp == 1) { //the power down that should last for 10 seconds
-		srcCar.powerUp = 0;
-		srcCar.rotateUnit += SPEEDPUP1;
+    //removes effects of other power ups from cars[i]
+    if (srcCar.powerUp == 1) { //the power down that should last for 10 seconds
+        srcCar.powerUp = 0;
+        srcCar.rotateUnit += SPEEDPUP1;
 
-	}
-	//if cars[i] has power up of type 3, clear it before adding the effects
-	if (srcCar.powerUp == 3) {
-		srcCar.powerUp = 0;
-	}
-	
-	//if cars[i] has power up of type 2, clear it
-	if (srcCar.powerUp == 2) {
+    }
+    //if cars[i] has power up of type 3, clear it before adding the effects
+    if (srcCar.powerUp == 3) {
+        srcCar.powerUp = 0;
+    }
+    
+    //if cars[i] has power up of type 2, clear it
+    if (srcCar.powerUp == 2) {
 
-		srcCar.powerUp = 0; //clear power up flag
-		//reset speed 
-		srcCar.speed = speed + srcCar.score;
-		//clamp speed
-		if (srcCar.speed > MAX_SPEED) {
-			srcCar.speed = MAX_SPEED;
-		}
-	}
-	
+        srcCar.powerUp = 0; //clear power up flag
+        //reset speed 
+        srcCar.speed = speed + srcCar.score;
+        //clamp speed
+        if (srcCar.speed > MAX_SPEED) {
+            srcCar.speed = MAX_SPEED;
+        }
+    }
+    
 }
 
 /*
@@ -721,58 +720,58 @@ srcCar
 function detectCarPowerupCollisions(srcCar) {
 
     for (j = 0; j < powerUps.length; j++) {
-		//for (i = 0; i < cars.length; i++) {
-		
-			if (powerUps[j].consumed == 0) { //if the power up isn't consumed, proceed
-				//check distance between center of power up and center of car 
-	
-					//a power up is a square with 25 x 25 dimensions
-					if ((Math.pow(cars[i].x - powerUps[j].x, 2) +
-							Math.pow(cars[i].y - powerUps[j].y, 2)) < Math.pow(50, 2)) {
-						console.log("power up event");
-						
-						//removes effects of other power ups from cars[i]
-						if (cars[i].powerUp == 1) { //the power down that should last for 10 seconds
-							cars[i].powerUp = 0;
-							cars[i].rotateUnit += SPEEDPUP1;
+        //for (i = 0; i < cars.length; i++) {
+        
+            if (powerUps[j].consumed == 0) { //if the power up isn't consumed, proceed
+                //check distance between center of power up and center of car 
+    
+                    //a power up is a square with 25 x 25 dimensions
+                    if ((Math.pow(cars[i].x - powerUps[j].x, 2) +
+                            Math.pow(cars[i].y - powerUps[j].y, 2)) < Math.pow(50, 2)) {
+                        console.log("power up event");
+                        
+                        //removes effects of other power ups from cars[i]
+                        if (cars[i].powerUp == 1) { //the power down that should last for 10 seconds
+                            cars[i].powerUp = 0;
+                            cars[i].rotateUnit += SPEEDPUP1;
 
-						}
-						//if cars[i] has power up of type 3, clear it before adding the effects
-						if (cars[i].powerUp == 3) {
-							cars[i].powerUp = 0;
-						}
-						
-						//if cars[i] has power up of type 2, clear it
-						if (cars[i].powerUp == 2) {
+                        }
+                        //if cars[i] has power up of type 3, clear it before adding the effects
+                        if (cars[i].powerUp == 3) {
+                            cars[i].powerUp = 0;
+                        }
+                        
+                        //if cars[i] has power up of type 2, clear it
+                        if (cars[i].powerUp == 2) {
 
-							cars[i].powerUp = 0; //clear power up flag
-							//reset speed 
-							cars[i].speed = speed + cars[i].score;
-							//clamp speed
-							if (cars[i].speed > MAX_SPEED) {
-								cars[i].speed = MAX_SPEED;
-							}
-						}
+                            cars[i].powerUp = 0; //clear power up flag
+                            //reset speed 
+                            cars[i].speed = speed + cars[i].score;
+                            //clamp speed
+                            if (cars[i].speed > MAX_SPEED) {
+                                cars[i].speed = MAX_SPEED;
+                            }
+                        }
 
-						//set the power up flag of cars[i]	
-						if (powerUps[j].type == 1) {
-							cars[i].powerUp = 1; //car gets the power up
+                        //set the power up flag of cars[i]    
+                        if (powerUps[j].type == 1) {
+                            cars[i].powerUp = 1; //car gets the power up
 
-						} 
-						else if (powerUps[j].type == 2) {
-							cars[i].powerUp = 2; //car gets the power up	
-						} 
-						else if (powerUps[j].type == 3) {
-							cars[i].powerUp = 3; //car gets the power up	
-						}
-						
-						powerUps[j].consumed = 1; //power up is consumed
-					}
-				
+                        } 
+                        else if (powerUps[j].type == 2) {
+                            cars[i].powerUp = 2; //car gets the power up    
+                        } 
+                        else if (powerUps[j].type == 3) {
+                            cars[i].powerUp = 3; //car gets the power up    
+                        }
+                        
+                        powerUps[j].consumed = 1; //power up is consumed
+                    }
+                
 
-				
-			}
-		//}	
+                
+            }
+        //}    
     }
 
 }
@@ -786,10 +785,10 @@ function updateClients() {
     //console.log("sending updates to clients");
     //determine all collisions and update both the cars list and the power ups list
 
-	
-	//detectCarPowerupCollisions(); //see what cars got what power ups and set powerup flag
-	
-	//ApplyPowerUps();     //apply the effect of the obtained power ups. 
+    
+    //detectCarPowerupCollisions(); //see what cars got what power ups and set powerup flag
+    
+    //ApplyPowerUps();     //apply the effect of the obtained power ups. 
 
     removeDeadCars(); // popped cars get removed 
 
@@ -877,7 +876,7 @@ function clearCollisionFlags() {
 generates 8 type 1 power ups and pushes them the powerUps list
 */
 function generateType1Pups() {
-    // 8 powerups of type 1
+    
     newPowerUp = powerUp(1000, 1000, 1);
     powerUps.push(newPowerUp);
 
@@ -962,7 +961,7 @@ function checkCarpUps() {
 
     for (i = 0; i < cars.length; i++) {
         if (cars[i].powerUp == 1) { //the ppower down that should last for 10 seconds
-            if (Math.floor(Date.now() / 1000) - cars[i].pUp1TimerStart > 10) {
+            if (Math.floor(Date.now() / 1000) - cars[i].pUpTimerStart > 10) {
                 cars[i].powerUp = 0;
                 cars[i].rotateUnit += SPEEDPUP1;
             }
@@ -975,7 +974,7 @@ function checkCarpUps() {
 
         if (cars[i].powerUp == 2) {
 
-            if (Math.floor(Date.now() / 1000) - cars[i].pUp2TimerStart > 6) {
+            if (Math.floor(Date.now() / 1000) - cars[i].pUpTimerStart > 6) {
                 cars[i].powerUp = 0; //clear power up flag
                 //reset speed 
                 cars[i].speed = speed + cars[i].score;
@@ -1022,7 +1021,7 @@ function detectCollision(srcCar) {
         // we can do another check here to see if the two needles intersect
         //to do this we need to use the parametric equations of both line segments and find common
         //solution for the parametric equations. Not doable / too much work using javascript
-        //so for now ignore needle collision		
+        //so for now ignore needle collision        
 
     }
 
