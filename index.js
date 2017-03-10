@@ -754,50 +754,46 @@ function updateClients() {
 
     removeDeadCars(); // popped cars get removed 
 
-    removeConsumedPowerUps(); //consumed power ups get removed
+    //removeConsumedPowerUps(); //consumed power ups get removed
 
     checkCarpUps(); //clear power ups - for expired power ups before broadcasting
 
     //time to refill all type 1 power ups? - 60 seconds have passed since last time? 
     if (Math.floor(Date.now() / 1000) - Type1Pup > 60) {
-        Type1Pup = Math.floor(Date.now() / 1000);
-        //first remove all existing type 1 power ups from the powerUps list
+        Type1Pup = Math.floor(Date.now() / 1000); //set timestamp
+        //mark all existing type 1 power ups as not consumed; consumed = 0
         for (i = 0; i < powerUps.length; i++) {
             if (powerUps[i].type == 1) {
-                powerUps.splice(i, 1);
+              powerUps[i].consumed = 0;
             }
         }
-
-        //refill the powerUps list with all type 1 power ups
-        generateType1Pups();
+		
     }
 
 
-    //time to refill all type 2 power ups? - 40 seconds have passed since last time? 
-    if (Math.floor(Date.now() / 1000) - Type2Pup > 40) {
+    //time to refill all type 2 power ups? - 90 seconds have passed since last time? 
+    if (Math.floor(Date.now() / 1000) - Type2Pup > 90) {
         Type2Pup = Math.floor(Date.now() / 1000);
-        //first remove all existing type 2 power ups from the powerUps list
+        //mark all existing type 2 power ups as not consumed;  consumed = 0
         for (i = 0; i < powerUps.length; i++) {
             if (powerUps[i].type == 2) {
-                powerUps.splice(i, 1);
+                powerUps[i].consumed = 0;
             }
         }
-        //refill the powerUps list with all type 2 power ups
-        generateType2Pups();
+      
     }
 
 
     //time to refill all type 3 power ups? - 120 seconds have passed since last time? 
     if (Math.floor(Date.now() / 1000) - Type3Pup > 120) {
         Type3Pup = Math.floor(Date.now() / 1000);
-        //first remove all existing type 3 power ups from the powerUps list
+         //mark all existing type 3 power ups as not consumed;  consumed = 0
         for (i = 0; i < powerUps.length; i++) {
             if (powerUps[i].type == 3) {
-                powerUps.splice(i, 1);
+                powerUps[i].consumed = 0;
             }
         }
-        //refill the powerUps list with all type 3 power ups
-        generateType3Pups();
+       
     }
 
 
@@ -835,7 +831,7 @@ function clearCollisionFlags() {
 
 
 /*
-generates 8 type 1 power ups and pushes them the powerUps list
+generates 16 type 1 power ups and pushes them the powerUps list
 */
 function generateType1Pups() {
     
@@ -868,18 +864,18 @@ function generateType1Pups() {
 /*
 generates 4 type 2 power ups and pushes them the powerUps list
 */
-function generateType2Pups() {
+  function generateType2Pups() {
     //4 power ups of type 2
-    newPowerUp = powerUp(2000, 2000, 2);
+    newPowerUp = powerUp(2200, 2200, 2);
     powerUps.push(newPowerUp);
 
-    newPowerUp = powerUp(2000, 4000, 2);
+    newPowerUp = powerUp(2200, 3200, 2);
     powerUps.push(newPowerUp);
 
-    newPowerUp = powerUp(4000, 2000, 2);
+    newPowerUp = powerUp(3200, 1800, 2);
     powerUps.push(newPowerUp);
 
-    newPowerUp = powerUp(4000, 4000, 2);
+    newPowerUp = powerUp(3200, 3200, 2);
     powerUps.push(newPowerUp);
 }
 
