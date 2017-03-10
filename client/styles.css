@@ -45,6 +45,7 @@ div {
     margin-top: -2500px;
 }
 .bg{
+    /*
     -webkit-box-sizing: content-box;
     -moz-box-sizing: content-box;
     box-sizing: content-box;
@@ -64,7 +65,8 @@ div {
     -webkit-background-clip: border-box;
     background-clip: border-box;
     -webkit-background-size: 80px 80px;
-    background-size: 80px 80px;
+    background-size: 80px 80px;*/
+    background-image: url("img/bg_pattern_blue.png");
 }
 
 #moveObj {
