@@ -1,6 +1,7 @@
 //Server
 var socket = io();
 var firstPowerUpPush = 0; //initial power up batch marker flag
+var killfeedlist = [];
 
 //UI
 $('#enter_link').click(function() {
@@ -775,9 +776,54 @@ socket.on('update', function(lists) {
     if (gameState == 0) {
         return;
     }
+	
+	//update kill feed and display on the top left corner of the screen
+	if(lists.deadCars.length > 0){ //if there is a need to update kill feed proceed
+		
+		//update killfeedlist - length should be no more than 5
+		spaceInKillfeedlist = 5 - killfeedlist.length;
+		toAddToKillfeedlist = 0;
+		
+		//get number of killed cars to add to killfeedlist
+		for (i = 0; i < lists.deadCars.length; i++) {
+			if(lists.deadCars[i].killer != null){
+				toAddToKillfeedlist +=1;
+			}	
+		}
+		
+		//if there's enough space in killfeedlist, just push 
+		if(spaceInKillfeedlist >= toAddToKillfeedlist){
+			
+			for (i = 0; i < lists.deadCars.length; i++) {
+				
+				killfeedlist.push(lists.deadCars[i]);
+			}
+		}else{ //not enough speace in killfeedlist
+			toRemoveFromKillfeedlist = toAddToKillfeedlist - spaceInKillfeedlist;
+			toRemoveFromKillfeedlist = Math.min(5, toRemoveFromKillfeedlist);
+			//remove from killfeedlist
+			for (i = 0; i < toRemoveFromKillfeedlist; i++) {
+			
+				killfeedlist.splice(i,1);
+			}
+			
+			//now add to killfeedlist	
+			for (i = 0; i < toRemoveFromKillfeedlist; i++) {
+				
+				killfeedlist.push(lists.deadCars[i]);
+			}	
+		}
+	}
 
-    lboard = "Scoreboard<br/>";
-
+    killfeed = "Kill Feed <br/>";
+	//append all items to our killfeed string line by line
+	for (i = 0; i < killfeedlist.length; i++) {
+        killfeed += killfeedlist[i].killer+ " elminitated " + killfeedlist[i].nickname + "<br/>";
+    }
+	 $("#killfeed").html(killfeed); //set the content of killfeed div to the string killfeed
+	
+	
+	lboard = "Scoreboard <br/>";
     //Update Leaderboard
     for (i = 0; i < lists.cars.length; i++) {
         num = i + 1;
@@ -786,13 +832,17 @@ socket.on('update', function(lists) {
             break;
         }
     }
+	
     $("#leaderboard").html(lboard);
     //console.log("recieved update from the server.\n List of cars: ");
+	
+	
     try {
         var still_alive = 0;
         // Upadate our list of other players
         for (i = 0; i < lists.cars.length; i++) {
             updatingCar = lists.cars[i];
+			
 
             if (updatingCar.id == id) {
                 //console.log(id);
@@ -819,6 +869,7 @@ socket.on('update', function(lists) {
                 //console.log("listCar: "+updatingCar.id + " CarID:" + otherCars[j].id);
                 // update it's values if it is
                 if (updatingCar.id == otherCars[j].id) {
+					
 
                     //check collision adjustment
                     if (updatingCar.collided == 1) {

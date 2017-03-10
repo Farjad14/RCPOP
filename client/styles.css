@@ -195,6 +195,13 @@ div {
     right: 0;
 }
 
+#killfeed {
+    text-align: left;
+	color: #CC0066;
+    top: 0;
+    left: 0;
+}
+
 #enter_link {
     display: block;
     position: absolute;
