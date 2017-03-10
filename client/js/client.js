@@ -648,7 +648,7 @@ function gameLoop(fps) {
                 
                   //check powerup
                 var powerupEvent = detectpowerup();
-                if (powerupEvent != 0) { //if not null
+                if (powerupEvent) { //if not null
                     socket.emit("powerUp", {
                         id:id,
                         x:powerupEvent.x,
