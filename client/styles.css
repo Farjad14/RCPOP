@@ -89,13 +89,13 @@ div {
 .powerUp1 {
     width: 100px;
     height: 100px;
-    background-image: url("img/SpeedBoost.png");
+    background-image: url("img/DecreaseRotation.png");
 }
 
 .powerUp2 {
     width: 100px;
     height: 100px;
-    background-image: url("img/DecreaseRotation.png");
+    background-image: url("img/SpeedBoost.png");
 }
 
 .powerUp3 {

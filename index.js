@@ -358,7 +358,7 @@ io.on('connection', function(socket) {
             srcCar.rotateUnit -= SPEEDPUP1; //-3
             //set start timer for power up
             srcCar.pUp1TimerStart = Math.floor(Date.now() / 1000); //lasts for 10 seconds	
-			 console.log('power up type 1 applied');
+            console.log('power up type 1 applied');
         } 
 		
 		else if (srcCar.powerUp == 3) {
@@ -376,20 +376,24 @@ io.on('connection', function(socket) {
                         srcCar.speed = MAX_SPEED;
                     }
                     srcCar.score++;*/
+                    
                 } 
             }
+            console.log('power up type 3 applied');
         } 
 		
 		else if (srcCar.powerUp == 2) {
-            //we have 4 of this power up - once consumed, your car gains temporary speed 
-     
-            srcCar.speed += SPEEDPUP3; //+3
-            if (srcCar.speed > MAX_SPEED) {
-                srcCar.speed = MAX_SPEED;
-            }
-            //this power up lasts for 6 seconds ******* set start timer
-            srcCar.pUp2TimerStart = Math.floor(Date.now() / 1000);
+        //we have 4 of this power up - once consumed, your car gains temporary speed 
+ 
+        srcCar.speed += SPEEDPUP3; //+3
+        if (srcCar.speed > MAX_SPEED) {
+            srcCar.speed = MAX_SPEED;
+            
         }
+        //this power up lasts for 6 seconds ******* set start timer
+        srcCar.pUp2TimerStart = Math.floor(Date.now() / 1000);
+        console.log('power up type 2 applied');
+    }
 
 
     }); 

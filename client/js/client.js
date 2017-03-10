@@ -483,19 +483,18 @@ function detectPop() {
 
 
 function detectpowerup(){
-	
-	 for (j = 0; j < powerUps.length; j++) {
-	
-		//a power up is a square with 100 x 100 dimensions
-		if ((Math.pow(sprite.x - powerUps[j].x, 2) +
-				Math.pow(sprite.y - powerUps[j].y, 2)) < Math.pow(50, 2)) {
-			console.log("power up event");
-			return powerUps[j];
-		}
-			
-	}
-	
-	return null;
+    
+     for (j = 0; j < powerUps.length; j++) {
+        //a power up is a square with 100 x 100 dimensions
+        if ((Math.pow(sprite.x - (powerUps[j].x+50), 2) +
+                Math.pow(sprite.y - (powerUps[j].y+50), 2)) < Math.pow(100, 2)) {
+            console.log("power up event");
+            return powerUps[j];
+        }
+            
+    }
+    
+    return null;
 }
 
 
@@ -522,7 +521,7 @@ function detectCollision() {
             // we can do another check here to see if the two needles intersect
             //to do this we need to use the parametric equations of both line segments and find common
             //solution for the parametric equations. Not doable / too much work using javascript
-            //so for now ignore needle collision		
+            //so for now ignore needle collision        
         }
     }
 
@@ -642,18 +641,18 @@ function gameLoop(fps) {
                         trgetid: othercr
                     });
                 }
-				
-				 //check powerup
+                
+                  //check powerup
                 var powerupEvent = detectpowerup();
                 if (powerupEvent) { //if not null
                     socket.emit("powerUp", {
-						id:id,
-						x:powerupEvent.x,
-						y:powerupEvent.y,
-						type:powerupEvent.type
-					});
+                        id:id,
+                        x:powerupEvent.x,
+                        y:powerupEvent.y,
+                        type:powerupEvent.type
+                    });
                 }
-				
+                
 
                 //check pop
                 var otherId = detectPop();
@@ -731,9 +730,9 @@ $(document).ready(function() {
 
 
 // Create varaibles for init
-/* var id;
+var id;
 var otherCars = [];
-var powerUPS = []; */
+var powerUPS = [];
 
 
 socket.on('id', function(newCar) {
@@ -773,9 +772,7 @@ socket.on('update', function(lists) {
         return;
     }
 
-
     lboard = "Scoreboard<br/>";
-	powerUps = lists.powerUps;
 
     //Update Leaderboard
     for (i = 0; i < lists.cars.length; i++) {
