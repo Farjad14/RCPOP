@@ -2,6 +2,9 @@
 var socket = io();
 var firstPowerUpPush = 0; //initial power up batch marker flag
 
+//kill id
+var kid = 0;
+
 //UI
 $('#enter_link').click(function() {
     var nickname = $("#u").val();
@@ -769,6 +772,15 @@ socket.on('id', function(newCar) {
     gameState = 1 - gameState;
     gameLoop(start_fps);
 
+});
+
+socket.on('killfeed', function(list) {
+    kid++;
+    var feed = "<p id='"+kid+"'>" + list.cars[0].nickname + "   popped   " + list.cars[1].nickname + "</p>";
+    $("#killfeed").prepend(feed);
+    
+    $("#"+kid).fadeIn(500);
+    setTimeout(function(){ $("#"+kid).fadeOut(1000);}, 2000);
 });
 
 socket.on('update', function(lists) {

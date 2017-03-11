@@ -517,6 +517,9 @@ io.on('connection', function(socket) {
                 console.log(' deadCar not found!');
             } else if (deadCar.alive == 1){
                 deadCar.alive = 0;
+                
+                //Update kill feed
+                setKillFeed(srcCar, deadCar);
 
                 //increase car's speed by a percent of the killed cars speed plus base amount
                 srcCar.speed +=1; //(deadCar.speed - 10) * PERC_GAIN + BASE_GAIN;
@@ -531,6 +534,13 @@ io.on('connection', function(socket) {
 
 
 });
+
+function setKillFeed(srcCar, deadCar){
+    io.emit("killfeed", {cars : [srcCar, deadCar]});
+    console.log(srcCar);
+     console.log(deadCar);
+    console.log("sent killfeed info");
+}
 
 function ridPowerUp(srcCarData){
     for (i = 0; i < powerUps.length; i++) {

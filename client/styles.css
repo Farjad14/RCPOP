@@ -303,3 +303,14 @@ div {
 #finalScore {
     width: 100%;
 }
+#killfeed {
+  bottom: 0px;
+  left: 0px;
+}
+#killfeed p{
+  padding: 10px;
+  border-radius: 10px;
+  background-color: grey;
+  color:white;
+  margin: 0px;
+}
