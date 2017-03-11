@@ -188,7 +188,7 @@ div {
 }
 
 #score {
-    bottom: 0;
+    top: 0;
     left: 0;
 }
 
@@ -305,4 +305,15 @@ div {
 
 #finalScore {
     width: 100%;
+}
+#killfeed {
+  bottom: 0px;
+  left: 0px;
+}
+#killfeed p{
+  padding: 10px;
+  border-radius: 10px;
+  background-color: grey;
+  color:white;
+  margin: 0px;
 }

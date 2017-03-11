@@ -1,5 +1,9 @@
 //Server
 var socket = io();
+var firstPowerUpPush = 0; //initial power up batch marker flag
+
+//kill id
+var kid = 0;
 
 //UI
 $('#enter_link').click(function() {
@@ -485,6 +489,9 @@ function detectPop() {
 function detectpowerup(){
     
      for (j = 0; j < powerUps.length; j++) {
+		if(powerUps[j].consumed == 1){
+			 continue;
+		}
         //a power up is a square with 100 x 100 dimensions
         if ((Math.pow(sprite.x - (powerUps[j].x+50), 2) +
                 Math.pow(sprite.y - (powerUps[j].y+50), 2)) < Math.pow(100, 2)) {
@@ -767,6 +774,15 @@ socket.on('id', function(newCar) {
 
 });
 
+socket.on('killfeed', function(list) {
+    kid++;
+    var feed = "<p id='"+kid+"'>" + list.cars[0].nickname + "   popped   " + list.cars[1].nickname + "</p>";
+    $("#killfeed").prepend(feed);
+    
+    $("#"+kid).fadeIn(500);
+    setTimeout(function(){ $("#"+kid).fadeOut(1000);}, 2000);
+});
+
 socket.on('update', function(lists) {
     if (gameState == 0) {
         return;
@@ -847,8 +863,59 @@ socket.on('update', function(lists) {
             }
         }
 
-        // check all the power ups in the power up list
-        for (i = 0; i < lists.powerUps.length; i++) {
+        // render power ups
+		if(firstPowerUpPush == 0){ 
+			//set powerUps list to the new batch and create all power up divs
+			powerUps = lists.powerUps;
+			 for (i = 0; i < powerUps.length; i++) {
+				 console.log("first power up batch");
+				 if (powerUps[i].type == 1) {
+                    powerUpImages.push($('<div class="powerUp1"></div>'));
+                    powerUpImages[i].appendTo("#map");
+                    powerUpImages[i].css("left", powerUps[i].x + "px");
+                    powerUpImages[i].css("top", powerUps[i].y + "px");
+
+
+                } else if (powerUps[i].type == 2) {
+                    powerUpImages.push($('<div class="powerUp2"></div>'));
+                    powerUpImages[i].appendTo("#map");
+                    powerUpImages[i].css("left", powerUps[i].x + "px");
+                    powerUpImages[i].css("top", powerUps[i].y + "px");
+
+                } else if (powerUps[i].type == 3) {
+                    powerUpImages.push($('<div class="powerUp3"></div>'));
+                    powerUpImages[i].appendTo("#map");
+                    powerUpImages[i].css("left", powerUps[i].x + "px");
+                    powerUpImages[i].css("top", powerUps[i].y + "px");
+                }
+				 
+			 }
+			
+			
+			firstPowerUpPush = 1;
+		}
+		
+		//not first batch of power ups - display only availabe ones - consumed = 0
+		else if(firstPowerUpPush == 1){
+			
+			for (i = 0; i < powerUps.length; i++) {
+				 powerUpImages[i].css("display", "none"); // hide all current power ups
+			}
+			
+			//update powerUps list to latest batch = lists.powerUps
+			powerUps = lists.powerUps;
+			
+			
+			// show only available powerups
+			for (i = 0; i < powerUps.length; i++) {
+				 if(powerUps[i].consumed == 0){
+					powerUpImages[i].css("display", "block");
+				 }	 
+			}
+		}
+		
+		
+     /*    for (i = 0; i < lists.powerUps.length; i++) {
             if (powerUps.length <= i) { // if the list doesn't include that power up add it
                 console.log("Appending power up");
                 powerUps.push(lists.powerUps[i]);
@@ -879,8 +946,8 @@ socket.on('update', function(lists) {
                 powerUpImages.splice(i, 1);
                 i--;
             }
-        }
-        if (lists.powerUps.length != powerUps.length) console.log("Power up list length mismatch");
+        } */
+        //if (lists.powerUps.length != powerUps.length) console.log("Power up list length mismatch");
         
         if (still_alive == 0) {
             gameState = 0;
