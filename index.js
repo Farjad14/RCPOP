@@ -67,7 +67,6 @@ car = function(x, y, orientation) {
         score: 0,
         pUpTimerStart: 0,
         alive: 1,
-		killer:null,
         tipx: 0,
         tipy: 0,
         powerUp: 0, //no power ups initially
@@ -99,7 +98,7 @@ powerUps = [];
 //a list that holds all cars on the map
 cars = [];
 
-//a list for dead cars that were popped in the current round -  last 30ms
+//a list for dead cars that were popped in the current round -  30ms
 deadCars = [];
 
 
@@ -518,7 +517,6 @@ io.on('connection', function(socket) {
                 console.log(' deadCar not found!');
             } else if (deadCar.alive == 1){
                 deadCar.alive = 0;
-				deadCar.killer = srcCar.nickname;
 
                 //increase car's speed by a percent of the killed cars speed plus base amount
                 srcCar.speed +=1; //(deadCar.speed - 10) * PERC_GAIN + BASE_GAIN;
@@ -526,7 +524,6 @@ io.on('connection', function(socket) {
                     srcCar.speed = MAX_SPEED;
                 }
                 srcCar.score++;
-				srcCar.victim = deadCar.nickname;
             }
         }
     });
@@ -608,7 +605,6 @@ function removeDeadCars() {
         }
     }
 }
-
 
 function generateRandomLoc() {
     var x = Math.floor(Math.random() * 4500) + 250;
