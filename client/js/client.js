@@ -974,7 +974,9 @@ socket.on('update', function(lists) {
         if (still_alive == 0) {
             gameState = 0;
             $("#finalScore").html("You scored: " + sprite.score);
+            setTimeout(function(){ 
             $("#splashscreen").fadeIn(500);
+            }, 400);
 
         }
 
