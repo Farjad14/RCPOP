@@ -782,12 +782,16 @@ socket.on('killfeed', function(list) {
         feed = "<p id='"+kid+"'>" + list.cars[0].nickname + "   popped   " + list.cars[1].nickname + "</p>";
     }
     else{
-        feed = "<p id='"+kid+"'>" + list.cars[1].nickname + " killed themselves!!! LOL WHAT A PLEB</p>";
+        feed = "<p id='"+kid+"'>" + list.cars[1].nickname + " took the easy way out</p>";
     }
         $("#killfeed").prepend(feed);
     
         $("#"+kid).fadeIn(500);
-        setTimeout(function(){ $("#"+kid).fadeOut(1000);}, 2000);
+        setTimeout(function(){ 
+        $("#"+kid).fadeOut(1000);
+        
+        $("#"+kid).remove();
+        }, 2000);
         
 });
 
