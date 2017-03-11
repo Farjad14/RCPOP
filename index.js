@@ -29,8 +29,9 @@ const map_height = 5000;
 const PERC_GAIN = 1 / 4;
 const BASE_GAIN = 0.25;
 const MAX_SPEED = 16;
-const SPEEDPUP3 = 5;
-const SPEEDPUP1 = 4;
+const SPEEDPUP3 = 3;
+const SPEEDPUP1 = 3;
+const EXPLOSION_KILL_RANGE = 400;
 
 
 //global variables that define variant quantities in our program
@@ -376,7 +377,7 @@ io.on('connection', function(socket) {
            
             for (i = 0; i < cars.length; i++) {
                 if ((Math.pow(cars[i].x - srcCar.x, 2) + Math.pow(cars[i].y - srcCar.y, 2)) <
-                    Math.pow(300, 2) && (srcCar.id != cars[i].id)) {
+                    Math.pow(EXPLOSION_KILL_RANGE, 2) && (srcCar.id != cars[i].id)) {
                     cars[i].alive = 0;
                     
                 }
@@ -929,7 +930,7 @@ function checkCarpUps() {
 
     for (i = 0; i < cars.length; i++) {
         if (cars[i].powerUp == 1) { //the ppower down that should last for 10 seconds
-            if (Math.floor(Date.now() / 1000) - cars[i].pUpTimerStart > 10) {
+            if (Math.floor(Date.now() / 1000) - cars[i].pUpTimerStart > 4) {
                 cars[i].powerUp = 0;
                 cars[i].rotateUnit += SPEEDPUP1;
 				cars[i].speed = speed + cars[i].score;
@@ -943,7 +944,7 @@ function checkCarpUps() {
 
         if (cars[i].powerUp == 2) {
 
-            if (Math.floor(Date.now() / 1000) - cars[i].pUpTimerStart > 6) {
+            if (Math.floor(Date.now() / 1000) - cars[i].pUpTimerStart > 4) {
                 cars[i].powerUp = 0; //clear power up flag
                 //reset speed 
                 cars[i].speed = speed + cars[i].score;

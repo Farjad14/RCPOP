@@ -961,9 +961,9 @@ socket.on('update', function(lists) {
         //
         for (i = 0; i < lists.deadCars.length; i++) {
             console.log('length of deadCars list: ' + lists.deadCars.length);
-            var w = 640 // Get the actual width/2 $("#stage").get(0).width;
-            var h = 340 // Get the actual height/2 $("#stage").get(0).hieght;
-            if ((Math.abs(lists.deadCars[i].x - sprite.x) > w) && (Math.abs(lists.deadCars[i].y - sprite.y) > h)) {
+            var w = 700 // Get the actual width/2 $("#stage").get(0).width;
+            var h = 400 // Get the actual height/2 $("#stage").get(0).hieght;
+            if ((Math.abs(lists.deadCars[i].x - sprite.x) < w) && (Math.abs(lists.deadCars[i].y - sprite.y) < h)) {
                 $("#popped").get(0).play();
                 console.log("audio played");
             }
