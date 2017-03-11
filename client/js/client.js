@@ -7,6 +7,7 @@ var kid = 0;
 
 //UI
 $('#enter_link').click(function() {
+    if (gameState != 0) return;
     var nickname = $("#u").val();
     console.log(nickname);
     socket.emit('new client', nickname);
@@ -20,6 +21,7 @@ document.body.addEventListener("keydown", function(e) {
 
     // Enter is pressed
     if (e.keyCode == 13) {
+        if (gameState != 0) return;
         var nickname = $("#u").val();
         console.log(nickname);
         socket.emit('new client', nickname);
@@ -42,7 +44,8 @@ var mouse_y = 0;
 
 //init end
 
-
+//define constants		
+const MAX_FEED_LENGTH = 10;
 
 
 //utility functions
@@ -782,12 +785,17 @@ socket.on('killfeed', function(list) {
         feed = "<p id='"+kid+"'>" + list.cars[0].nickname + "   popped   " + list.cars[1].nickname + "</p>";
     }
     else{
-        feed = "<p id='"+kid+"'>" + list.cars[1].nickname + " killed themselves!!! LOL WHAT A PLEB</p>";
+        feed = "<p id='"+kid+"'>" + list.cars[1].nickname + " took the easy way out</p>";
     }
         $("#killfeed").prepend(feed);
     
         $("#"+kid).fadeIn(500);
-        setTimeout(function(){ $("#"+kid).fadeOut(1000);}, 2000);
+        setTimeout(function(){
+            $("#"+kid).fadeOut(1000);		
+              if ($("#"+kid-MAX_FEED_LENGTH-1)) {		
+                $("#"+kid-MAX_FEED_LENGTH-1).remove();		
+            }		
+        }, 2000);
         
 });
 
@@ -966,7 +974,9 @@ socket.on('update', function(lists) {
         if (still_alive == 0) {
             gameState = 0;
             $("#finalScore").html("You scored: " + sprite.score);
-            $("#splashscreen").fadeIn(500);
+            setTimeout(function(){ 
+                $("#splashscreen").fadeIn(500);
+            }, 400);
 
         }
 

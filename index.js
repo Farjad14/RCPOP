@@ -264,7 +264,6 @@ io.on('connection', function(socket) {
              
         //Check if car goes off map
         if (data.x > map_width || data.x < 0 || data.y > map_height || data.y < 0) { //out of bounds, dead
-            console.log("lol kys");
             cars[i].alive = 0;
             
             //Set suicide message to killfeed
@@ -804,7 +803,7 @@ generates 4 type 2 power ups and pushes them the powerUps list
 */
   function generateType2Pups() {
     //4 power ups of type 2
-    newPowerUp = powerUp(2200, 2200, 2);
+    newPowerUp = powerUp(2250, 2250, 2);
     powerUps.push(newPowerUp);
 
     newPowerUp = powerUp(2200, 3200, 2);
@@ -827,6 +826,16 @@ function generateType3Pups() {
 
 }
 
+function generatePups(type, x_start, y_start, x_inc, y_inc, x_nums, y_nums) {
+    for (i = 0; i < x_nums; i++) {
+        for (j = 0; j < x_nums; j++) {
+          newPowerUp = powerUp(x_start+i*x_inc, y_start+j*y_inc, type);
+          powerUps.push(newPowerUp);
+        }
+    }
+}
+
+
 /*
 generate 8 type 1 power ups and 4 type 2 power ups at fixed locations on the map
 then push these power ups to the powerUps list - this function is called when the game 
@@ -834,9 +843,9 @@ starts - the first player joings the game
 */
 function generatePowerUps() {
 
-    generateType1Pups();
-    generateType2Pups();
-    generateType3Pups();
+    generatePups(1, 1000, 1000, 1000, 1000, 4, 4);
+    generatePups(2, 1750, 1750, 500, 500, 4, 4);
+    generatePups(3, 2500, 2500, 0, 0, 1, 1);
 }
 
 /*
