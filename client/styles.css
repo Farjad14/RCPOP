@@ -78,12 +78,13 @@ div {
     top: 300px;
     height: 100px;
     width: 100px;
-    background-color: red;
+    background-image: url("img/ourCar.png");
+    //background-color: red;
     padding: 0;
     //max-height:100px;
     margin-left: -50px;
     margin-top: -50px;
-    border: 2px solid black;
+    //border: 2px solid black;
     //change origin of rotation
     //transform-origin: 50& 0%;
 }
@@ -113,12 +114,13 @@ div {
     top: 50%;
     height: 100px;
     width: 100px;
-    background-color: green;
+    background-image: url("img/otherCar.png");
+    //background-color: green;
     padding: 0;
     //max-height:100px;
     margin-left: -50px;
     margin-top: -50px;
-    border: 2px solid black;
+    //border: 2px solid black;
     //change origin of rotation
     //transform-origin: 50& 0%;
 }
@@ -128,8 +130,9 @@ div {
     height: 120px;
     top: 100px;
     left: -10px;
-    border-radius: 50%;
-    background-color: pink;
+    background-image: url("img/balloon.png");
+    //border-radius: 50%;
+    //background-color: pink;
 }
 
 .pin {
