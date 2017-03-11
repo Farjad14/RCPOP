@@ -776,11 +776,19 @@ socket.on('id', function(newCar) {
 
 socket.on('killfeed', function(list) {
     kid++;
-    var feed = "<p id='"+kid+"'>" + list.cars[0].nickname + "   popped   " + list.cars[1].nickname + "</p>";
-    $("#killfeed").prepend(feed);
+    var feed = "";
+    if(list.cars[0] != null){
+        
+        feed = "<p id='"+kid+"'>" + list.cars[0].nickname + "   popped   " + list.cars[1].nickname + "</p>";
+    }
+    else if{
+        feed = "<p id='"+kid+"'>"list.cars[1].nickname + " killed themselves!!! LOL WHAT A PLEB</p>";
+    }
+        $("#killfeed").prepend(feed);
     
-    $("#"+kid).fadeIn(500);
-    setTimeout(function(){ $("#"+kid).fadeOut(1000);}, 2000);
+        $("#"+kid).fadeIn(500);
+        setTimeout(function(){ $("#"+kid).fadeOut(1000);}, 2000);
+        
 });
 
 socket.on('update', function(lists) {
