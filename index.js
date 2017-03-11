@@ -53,7 +53,7 @@ car = function(x, y, orientation) {
         x: x,
         y: y,
         nickname: null,
-		inpowerup:0,
+        inpowerup:0,
         prev_x: 0,
         prev_y: 0,
         prevOrientation: 0,
@@ -243,20 +243,6 @@ io.on('connection', function(socket) {
             return;
         }
 
-        //car in the middle of collision event, skip position update
-        /* if(srcCar.collided == 1){
-            console.log("collided car won't update position until next round!");
-            return;
-        } */
-
-        /* var prevCollision = 0; //collisin in previous round
-        if(srcCar.prevCollided == 1){ 
-            prevCollision = 1;
-        }
-        srcCar.prevCollided =0; //reset paramter */
-
-
-
         //car travelled too big a distance between two consective location upates
         if ((Math.pow(srcCar.x - data.x, 2) + Math.pow(srcCar.y - data.y, 2)) >
             Math.pow(6 * srcCar.speed, 2)) {
@@ -271,24 +257,10 @@ io.on('connection', function(socket) {
         srcCar.prev_y = srcCar.y;
         srcCar.prevOrientation = srcCar.orientation;
 
-
         //update the current paramters of the car
         srcCar.x = data.x;
         srcCar.y = data.y;
         srcCar.orientation = data.orientation;
-        //console.log("position update successfully");
-        /*     if(Math.abs(srcCar.prevOrientation - srcCar.orientation) > 4*srcCar.rotateUnit){
-                if(prevCollision){
-                //cheat detected
-                //throw car back to latest valid location and orientation
-                
-                srcCar.x = srcCar.prev_x;
-                srcCar.y = srcCar.prev_y;
-                srcCar.orientation = srcCar.prevOrientation;
-                console.log("orientation cheat detected");
-                }
-            }    
-             */
              
         //Check if car goes off map
         if (data.x > map_width || data.x < 0 || data.y > map_height || data.y < 0) { //out of bounds, dead
@@ -297,29 +269,8 @@ io.on('connection', function(socket) {
             
             //Set suicide message to killfeed
             setKillFeed(null, cars[i]);
-            console.log("lol kys");
         }
 
-
-        /* for(i = 0; i < cars.length; i++){
-            if(cars[i].id == socket.id){ //found car
-                if(cars[i].collided == 0){
-                    cars[i].prev_x = cars[i].x;
-                    cars[i].prev_y = cars[i].y;
-                    //cars[i].prev_stamp = cars[i].cur_stamp;
-
-                    cars[i].x = data.x;
-                    cars[i].y = data.y;
-                    cars[i].orientation = data.orientation;
-                    
-                    if(data.x > map_width || data.x < 0 || data.y > map_height || data.y < 0){//out of bounds, dead
-                        cars[i].alive = 0;
-                    }
-                    
-                    break;
-                }
-            } 
-        }*/
     });
 
 
@@ -329,30 +280,28 @@ io.on('connection', function(socket) {
     It confirms whether the power up was indeed consumed by srcCar and applies power up effects 
     accroding to the type of power up consumed by srcCar
     */
-     socket.on('powerUp', function(srcCarData) {
-       
-		
+    socket.on('powerUp', function(srcCarData) {
+           
 
-
-        
+            
         //find the car object for the car the sent the collision event
         var srcCar = findCarById(srcCarData.id);
-		
-		if(!srcCar){return;}//srcCAr is null - not found
-		
-		//save current power up time stamp to previous
-        srcCar.prevPUPStamp = srcCar.curPUPStamp;
+        
+        if(!srcCar){return;}//srcCAr is null - not found
+        
+            //save current power up time stamp to previous
+            srcCar.prevPUPStamp = srcCar.curPUPStamp;
 
-        //record time stamp of this power up notification
-        srcCar.curPUPStamp = Date.now();
+            //record time stamp of this power up notification
+            srcCar.curPUPStamp = Date.now();
 
-        //if the two collision are too close - within 50ms, ignore the second one
-        if(srcCar.curPUPStamp - srcCar.prevPUPStamp < 250){ //return - multiple notfications for same power up
-			return;
-		}
-		
-		 console.log('potential powerup event');
-		
+            //if the two collision are too close - within 50ms, ignore the second one
+            if(srcCar.curPUPStamp - srcCar.prevPUPStamp < 250){ //return - multiple notfications for same power up
+          return;
+        }
+        
+        console.log('potential powerup event');
+        
         //check to see if the car has indeed consumed a power and if it has, set the powerUp field
         //to the type of the power - a number - and mark the powerUP object as consumed
         //detectCarPowerupCollisions(srcCar, srcCarData); //this function does all of the above
@@ -370,10 +319,10 @@ io.on('connection', function(socket) {
         
         if (srcCar.powerUp == 1) {
             //this is a power down
-			//reduce rotation speed of car by SPEEDPUP1
+            //reduce rotation speed of car by SPEEDPUP1
             srcCar.rotateUnit -= SPEEDPUP1; //-4
-			//reduce speed of car by SPEEDPUP3
-			srcCar.speed -= SPEEDPUP3; //-3
+            //reduce speed of car by SPEEDPUP3
+            srcCar.speed -= SPEEDPUP3; //-3
             //set start timer for power up
             srcCar.pUpTimerStart = Math.floor(Date.now() / 1000); //lasts for 10 seconds    
             console.log('power up type 1 applied');
@@ -393,18 +342,18 @@ io.on('connection', function(socket) {
         } 
         
         else if (srcCar.powerUp == 2) {
-        //we have 4 of this power up - once consumed, your car gains temporary speed 
- 
-        srcCar.speed += SPEEDPUP3; //+3
-        if (srcCar.speed > MAX_SPEED) {
-            srcCar.speed = MAX_SPEED;
-            
+          //we have 4 of this power up - once consumed, your car gains temporary speed 
+   
+          srcCar.speed += SPEEDPUP3; //+3
+          if (srcCar.speed > MAX_SPEED) {
+              srcCar.speed = MAX_SPEED;
+              
+          }
+          //this power up lasts for 6 seconds ******* set start timer
+          srcCar.pUpTimerStart = Math.floor(Date.now() / 1000);
+          console.log('power up type 2 applied');
         }
-        //this power up lasts for 6 seconds ******* set start timer
-        srcCar.pUpTimerStart = Math.floor(Date.now() / 1000);
-        console.log('power up type 2 applied');
-		}
-		
+        
 
     }); 
 
@@ -433,12 +382,6 @@ io.on('connection', function(socket) {
             return;
         }
 
-        /* if(srcCar.collided == 1){//car under collisoin effect
-            console.log('in on collision - srcCAr under existing collision');
-            return;
-            
-        } */
-
         //next find the target car the collided with srcCar
         var trgtCar = detectCollision(srcCar);
 
@@ -448,11 +391,6 @@ io.on('connection', function(socket) {
             console.log('in on collision - trgtCar not found ');
             return;
         }
-
-        // if(trgtCar.collided == 1){//car under collisoin effect
-        // console.log('in on collision - trgtCar under existing collision');
-        // return;
-        // }
 
         if (srcCar.alive == 0 || trgtCar.alive == 0) { //if either car is dead
             console.log('in on collision - one of the cars is already dead');
@@ -501,23 +439,6 @@ io.on('connection', function(socket) {
             return;
         }
 
-        //var trgtCar = findCarById(srcCarData.trgtid);
-        //var trgtCar = detectCollision(srcCar);
-
-
-        /* if(!trgtCar){
-            console.log("in pop - trgtCar not found");
-            return;
-        } */
-        /*
-        trgtCar.alive = 0; //mark trgtCar as dead
-        console.log('pop event handled!');
-        //increase srcCar's speed by a percent of the killed cars speed plus base amount
-        srcCar.speed += (trgtCar.speed - 10)*PERC_GAIN + BASE_GAIN;
-        if (srcCar.speed > MAX_SPEED){ srcCar.speed = MAX_SPEED;}
-        srcCar.score++;
-        */
-
         if (srcCar.alive == 1) { //if car exists and is alive
             console.log(' got source car');
             var deadCar = detectPop(srcCar); //get popped car
@@ -530,7 +451,7 @@ io.on('connection', function(socket) {
                 setKillFeed(srcCar, deadCar);
 
                 //increase car's speed by a percent of the killed cars speed plus base amount
-                srcCar.speed +=1; //(deadCar.speed - 10) * PERC_GAIN + BASE_GAIN;
+                srcCar.speed += 1;//(deadCar.speed - 10) * PERC_GAIN + BASE_GAIN;
                 if (srcCar.speed > MAX_SPEED) {
                     srcCar.speed = MAX_SPEED;
                 }
@@ -589,7 +510,7 @@ function removePupEffct(srcCar){
     if (srcCar.powerUp == 1) { //the power down that should last for 10 seconds
         srcCar.powerUp = 0;
         srcCar.rotateUnit += SPEEDPUP1;
-		srcCar.speed = speed + srcCar.score;
+        srcCar.speed = speed + srcCar.score;
     }
     //if cars[i] has power up of type 3, clear it before adding the effects
     if (srcCar.powerUp == 3) {
@@ -784,7 +705,7 @@ function updateClients() {
               powerUps[i].consumed = 0;
             }
         }
-		
+        
     }
 
 
@@ -939,7 +860,7 @@ function checkCarpUps() {
             if (Math.floor(Date.now() / 1000) - cars[i].pUpTimerStart > 4) {
                 cars[i].powerUp = 0;
                 cars[i].rotateUnit += SPEEDPUP1;
-				cars[i].speed = speed + cars[i].score;
+                cars[i].speed = speed + cars[i].score;
             }
         }
 
