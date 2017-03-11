@@ -289,8 +289,15 @@ io.on('connection', function(socket) {
                 }
             }    
              */
+             
+        //Check if car goes off map
         if (data.x > map_width || data.x < 0 || data.y > map_height || data.y < 0) { //out of bounds, dead
+            console.log("lol kys");
             cars[i].alive = 0;
+            
+            //Set suicide message to killfeed
+            setKillFeed(null, cars[i]);
+            console.log("lol kys");
         }
 
 
@@ -528,6 +535,7 @@ io.on('connection', function(socket) {
                     srcCar.speed = MAX_SPEED;
                 }
                 srcCar.score++;
+                updateLeaderboard();
             }
         }
     });
@@ -538,8 +546,6 @@ io.on('connection', function(socket) {
 
 function setKillFeed(srcCar, deadCar){
     io.emit("killfeed", {cars : [srcCar, deadCar]});
-    console.log(srcCar);
-     console.log(deadCar);
     console.log("sent killfeed info");
 }
 
