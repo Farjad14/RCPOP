@@ -106,13 +106,13 @@ div {
 .powerUp2 {
     width: 100px;
     height: 100px;
-    background-image: url("img/SpeedBoost.png");
+    background-image: url("img/SpeedBoostBalloon.png");
 }
 
 .powerUp3 {
     width: 100px;
     height: 100px;
-    background-image: url("img/Barrage.png");
+    background-image: url("img/ExplosionBalloon.png");
 }
 
 .opponentCar {
