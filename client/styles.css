@@ -292,8 +292,8 @@ div {
     height: 4px;
     margin-left: -2px;
     margin-top: -2px;
-    border: 1px solid white;
-    background-color: white;
+    border: 1px solid #4286f4;
+    background-color: #4286f4;
     border-radius: 50%;
 }
 
@@ -303,7 +303,7 @@ div {
     height: 4px;
     margin-left: -2px;
     margin-top: -2px;
-    border: 1px solid black;
+    border: 1px solid #4286f4;
     border-radius: 50%;
 }
 
