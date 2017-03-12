@@ -847,9 +847,13 @@ socket.on('killfeed', function(list) {
         setTimeout(function(){
             $("#"+kid).fadeOut(1000);		
               if ($("#"+kid-MAX_FEED_LENGTH-1)) {		
-                $("#"+kid-MAX_FEED_LENGTH-1).remove();		
-            }		
+                $("#"+kid-MAX_FEED_LENGTH-1).remove();
+            }         
         }, 3000);
+        //cleanup
+        if ( kid % 5 == 0 ){
+            $("#killfeed").empty();
+        }
         
 });
 
