@@ -1,5 +1,6 @@
 div {
     position: absolute;
+    font-family: 'Baloo Bhaina', cursive;
 }
 
 #container {
@@ -66,7 +67,7 @@ div {
     background-clip: border-box;
     -webkit-background-size: 80px 80px;
     background-size: 80px 80px;*/
-    background-image: url("img/bg_pattern_blue.png");
+    background-image: url("img/bg_pattern-white.jpg");
 }
 
 #moveObj {
@@ -182,20 +183,27 @@ div {
     padding: 0;
     width: 400px;
     height: 400px;
-    top: 15%;
+    top: 5%;
     left: 50%;
     margin-left: -200px;
 }
 
 #score {
-    top: 0;
-    left: 0;
+    top: 1%;
+    left: 1%;
+    padding: 2px 5px;
 }
 
 #leaderboard {
     text-align: center;
-    top: 0;
-    right: 0;
+    top: 1%;
+    right: 1%;
+    padding: 10px;
+}
+
+#leaderboard h2 {
+    margin-top: -10px;
+    margin-bottom: -10px;
 }
 
 #enter_link {
@@ -212,7 +220,6 @@ div {
     text-decoration: none;
     width: 200px;
     left: 50%;
-    top: 230px;
     margin: 0;
     margin-left: -100px;
 }
@@ -262,7 +269,6 @@ div {
     border: 2px solid black;
     bottom: 10px;
     right: 20px;
-    background-color: green;
 }
 
 #mini_sprite {
@@ -303,22 +309,30 @@ div {
     font-size: 50px;
 }
 
+#leaderboard, #killfeed p, #miniMap, #score {
+    background-color: rgba(192,192,192,0.7);
+}
+
 #finalScore {
     width: 100%;
 }
 #killfeed {
-  bottom: 0px;
-  left: 0px;
+  bottom: 1%;
+  left: 1%;
+  
 }
 #killfeed p{
   padding: 10px;
   border-radius: 10px;
-  background-color: grey;
-  color:white;
   margin: 0px;
 }
 
 #killHud {
   top: 15%;
   left: 50%;
+}
+
+#killHud h1 {
+  padding-right: 15px;
+  padding-left: 15px;
 }
