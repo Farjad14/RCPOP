@@ -297,7 +297,6 @@ div {
 
 .player_name {
     position: absolute;
-    transform: rotate(90deg);
     height: 20px;
     width: 100px;
     left: -60px;

@@ -334,6 +334,10 @@ MoveSprite.prototype = {
             left: new_x,
             top: new_y
         });
+        $("#my_name").css({
+            left: new_x,
+            top: new_y+100
+        });
 
         s.x = new_x; //$(s.sprite).position().left;
         s.y = new_y; //$(s.sprite).position().top;
