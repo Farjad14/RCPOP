@@ -319,13 +319,13 @@ div {
     width: 100%;
 }
 #killfeed {
-  bottom: 1%;
-  left: 1%;
+  bottom: 0;
+  left: 0;
   
 }
 #killfeed p{
   color:white;
-  padding: 10px;
+  padding: 0px 10px;
   border-radius: 10px;
   margin: 0px;
   font-size: 30px;
@@ -340,5 +340,5 @@ div {
 #killHud h1 {
   padding-right: 15px;
   padding-left: 15px;
-  font: 35px;
+  font: 70px;
 }

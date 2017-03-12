@@ -540,6 +540,9 @@ function detectpowerup(){
         if ((Math.pow(sprite.x - (powerUps[j].x+50), 2) +
                 Math.pow(sprite.y - (powerUps[j].y+50), 2)) < Math.pow(100, 2)) {
             console.log("power up event");
+             if(powerUps[j].type == 1) {setKillHud( "<h1>Slowed!</h>");}
+             else if(powerUps[j].type == 2) {setKillHud( "<h1>Speed Up!</h>");}
+             else if(powerUps[j].type == 3) {setKillHud( "<h1>Explosion!</h>");}
             return powerUps[j];
         }
             
@@ -581,12 +584,11 @@ function detectCollision() {
 
 
 
-function setKillHud(){
-    f =  "<h1> +1 Kill</h>"; 
-    $("#killHud").html(f);
+function setKillHud(msg){
+    $("#killHud").html(msg);
     $("#killHud").fadeIn(500);
     setTimeout(function(){
-            $("#killHud").fadeOut(1000);		
+            $("#killHud").fadeOut(1000);
         }, 3000);
 }
 
@@ -885,7 +887,7 @@ socket.on('update', function(lists) {
 
                 }
                 if(sprite.score < updatingCar.score){
-                    setKillHud();
+                    setKillHud( "<h1> +1 Kill</h>");
                 }
                 sprite.setScore(updatingCar.score);
                 sprite.setSpeed(updatingCar.speed);
@@ -1028,7 +1030,7 @@ socket.on('update', function(lists) {
             $("#finalScore").html("You scored: " + sprite.score);
             setTimeout(function(){ 
                 $("#splashscreen").fadeIn(500);
-            }, 400);
+            }, 700);
 
         }
 
