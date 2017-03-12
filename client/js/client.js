@@ -27,6 +27,9 @@ document.body.addEventListener("keydown", function(e) {
         socket.emit('new client', nickname);
     }
 }, false);
+
+//Prevent zoom out
+document.body.addEventListener("wheel", zoomShortcut);
 // End of UI
 
 
@@ -69,6 +72,21 @@ function trackFps() {
 //normalizes unit according to current fps
 function normalize_unit(unit) {
     return (unit * (fps / real_fps));
+}
+
+//Prevent zoom out
+function zoomShortcut(e){
+  if(e.ctrlKey){            //[ctrl] pressed?
+    event.preventDefault();  //prevent zoom
+    if(e.deltaY<0){        //scrolling up?
+                            //do something..
+      return false;
+    }
+    if(e.deltaY>0){        //scrolling down?
+                            //do something..
+      return false;
+    }
+  }
 }
 
 
@@ -299,9 +317,17 @@ MoveSprite.prototype = {
     //rotate towards given element
     orientSprite: function(obj) {
         s = this;
+        if(s.sprite.attr('id')=='moveObj'){
         s.sprite.css({
             'transform': 'rotate(' + s.orientation + 'deg)'
         });
+        }
+        //only rotate opponent car, not name
+        else if(s.sprite.attr('id')=='oppCar'){
+            $("#oppCar").css({
+                'transform': 'rotate(' + s.orientation + 'deg)'
+        });
+        }
 
     }, //rotateTo end
 
@@ -334,10 +360,21 @@ MoveSprite.prototype = {
             left: new_x,
             top: new_y
         });
+        if(s.sprite.attr('id')=='moveObj'){
+            
         $("#my_name").css({
             left: new_x,
             top: new_y+100
         });
+            
+        }
+        else if(s.sprite.attr('id')=='oppCar'){
+            $("#oppName").css({
+            left: new_x,
+            top: new_y+100
+        });
+            
+        }
 
         s.x = new_x; //$(s.sprite).position().left;
         s.y = new_y; //$(s.sprite).position().top;
@@ -503,6 +540,9 @@ function detectpowerup(){
         if ((Math.pow(sprite.x - (powerUps[j].x+50), 2) +
                 Math.pow(sprite.y - (powerUps[j].y+50), 2)) < Math.pow(100, 2)) {
             console.log("power up event");
+             if(powerUps[j].type == 1) {setKillHud( "<h1>Slowed!</h>");}
+             else if(powerUps[j].type == 2) {setKillHud( "<h1>Speed Up!</h>");}
+             else if(powerUps[j].type == 3) {setKillHud( "<h1>Explosion!</h>");}
             return powerUps[j];
         }
             
@@ -544,13 +584,12 @@ function detectCollision() {
 
 
 
-function setKillHud(){
-    f =  "<h1> +1 Kill</h>"; 
-    $("#killHud").html(f);
+function setKillHud(msg){
+    $("#killHud").html(msg);
     $("#killHud").fadeIn(500);
     setTimeout(function(){
-            $("#killHud").fadeOut(1000);		
-        }, 2000);
+            $("#killHud").fadeOut(1000);
+        }, 3000);
 }
 
 //game loop
@@ -689,7 +728,7 @@ function gameLoop(fps) {
 
 
             } catch (e) {
-                alert(e);
+                alert(e + "1");
             }
 
 
@@ -739,7 +778,7 @@ $(document).ready(function() {
             mouse_x = e.pageX;
             mouse_y = e.pageY;
         } catch (e) {
-            alert(e);
+            alert(e+ "2");
         }
 
     });
@@ -808,7 +847,7 @@ socket.on('killfeed', function(list) {
               if ($("#"+kid-MAX_FEED_LENGTH-1)) {		
                 $("#"+kid-MAX_FEED_LENGTH-1).remove();		
             }		
-        }, 2000);
+        }, 3000);
         
 });
 
@@ -848,7 +887,7 @@ socket.on('update', function(lists) {
 
                 }
                 if(sprite.score < updatingCar.score){
-                    setKillHud();
+                    setKillHud( "<h1> +1 Kill</h>");
                 }
                 sprite.setScore(updatingCar.score);
                 sprite.setSpeed(updatingCar.speed);
@@ -878,7 +917,7 @@ socket.on('update', function(lists) {
             }
             // If it wasn't found add the new player to our array
             if (!found) {
-                otherCar = $('<div class="opponentCar"><div class="pin"></div><div class="balloon"></div><div class="player_name">' + updatingCar.nickname + '</div></div>').appendTo("#map");
+                otherCar = $('<div id="oppCar" class="opponentCar"><div class="pin"></div><div class="balloon"></div></div><div id="oppName" class="player_name">' + updatingCar.nickname + '</div>').appendTo("#map");
                 var newCar = new MoveSprite(otherCar);
                 newCar.setSpeed(10);
                 newCar.setPos(updatingCar.x, updatingCar.y);
@@ -991,7 +1030,7 @@ socket.on('update', function(lists) {
             $("#finalScore").html("You scored: " + sprite.score);
             setTimeout(function(){ 
                 $("#splashscreen").fadeIn(500);
-            }, 400);
+            }, 700);
 
         }
 
@@ -1033,7 +1072,7 @@ socket.on('update', function(lists) {
 
 
     } catch (e) {
-        alert(e);
+        alert(e+ "3");
     }
 
 });

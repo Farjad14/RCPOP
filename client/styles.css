@@ -193,6 +193,7 @@ div {
     top: 1%;
     left: 1%;
     padding: 2px 5px;
+    font-size: 20px;
 }
 
 #leaderboard {
@@ -302,14 +303,15 @@ div {
     left: -60px;
     top: 40px;
     padding: 0px;
-    font-size: 18px;
+    font-size: 23px;
 }
 
 .title {
-    font-size: 50px;
+    font-size: 70px;
+     margin-bottom: -50px;
 }
 
-#leaderboard, #killfeed p, #miniMap, #score {
+#leaderboard, #miniMap, #score {
     background-color: rgba(192,192,192,0.7);
 }
 
@@ -317,14 +319,17 @@ div {
     width: 100%;
 }
 #killfeed {
-  bottom: 1%;
-  left: 1%;
+  bottom: 0;
+  left: 0;
   
 }
 #killfeed p{
-  padding: 10px;
+  color:white;
+  padding: 0px 10px;
   border-radius: 10px;
   margin: 0px;
+  font-size: 30px;
+  background-color: rgba(0,0,0,0.7);
 }
 
 #killHud {
@@ -335,4 +340,5 @@ div {
 #killHud h1 {
   padding-right: 15px;
   padding-left: 15px;
+  font: 70px;
 }
