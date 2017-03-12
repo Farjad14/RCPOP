@@ -306,7 +306,8 @@ div {
 }
 
 .title {
-    font-size: 50px;
+    font-size: 70px;
+     margin-bottom: -50px;
 }
 
 #leaderboard, #killfeed p, #miniMap, #score {
@@ -325,6 +326,7 @@ div {
   padding: 10px;
   border-radius: 10px;
   margin: 0px;
+  font-size: 30px;
 }
 
 #killHud {
