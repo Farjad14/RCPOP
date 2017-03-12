@@ -834,10 +834,10 @@ socket.on('killfeed', function(list) {
     var feed = "";
     if(list.cars[0] != null){
         
-        feed = "<p id='"+kid+"'>" + list.cars[0].nickname + "   popped   " + list.cars[1].nickname + "</p>";
+        feed = "<p id='"+kid+"'><span class='shadow'>" + list.cars[0].nickname + "</span>   popped   <span class='shadow'>" + list.cars[1].nickname + "</span></p>";
     }
     else{
-        feed = "<p id='"+kid+"'>" + list.cars[1].nickname + " took the easy way out</p>";
+        feed = "<p id='"+kid+"'><span class='shadow'>" + list.cars[1].nickname + "</span>  took the easy way out</p>";
     }
         $("#killfeed").prepend(feed);
     
