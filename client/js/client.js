@@ -224,8 +224,10 @@ SpriteCamera.prototype = {
 
 
 //movement sprite object
-function MoveSprite(elem) {
+function MoveSprite(elem, id, n) {
     s = this;
+    s.nickname = n;
+    s.id = id;
     s.sprite = elem;
     s.speed = 0; // px per second
     s.x = $(s.sprite).position().left;
@@ -323,8 +325,8 @@ MoveSprite.prototype = {
         });
         }
         //only rotate opponent car, not name
-        else if(s.sprite.attr('id')=='oppCar'){
-            $("#oppCar").css({
+        else if(s.sprite.attr('class')=='opponentCar'){
+            $("#"+s.id).css({
                 'transform': 'rotate(' + s.orientation + 'deg)'
         });
         }
@@ -368,8 +370,8 @@ MoveSprite.prototype = {
         });
             
         }
-        else if(s.sprite.attr('id')=='oppCar'){
-            $("#oppName").css({
+        else if(s.sprite.attr('class')=='opponentCar'){
+            $("#"+s.nickname).css({
             left: new_x,
             top: new_y+100
         });
@@ -589,7 +591,7 @@ function setKillHud(msg){
     $("#killHud").fadeIn(500);
     setTimeout(function(){
             $("#killHud").fadeOut(1000);
-        }, 1000);
+        }, 3000);
 }
 
 //game loop
@@ -834,10 +836,10 @@ socket.on('killfeed', function(list) {
     var feed = "";
     if(list.cars[0] != null){
         
-        feed = "<p id='"+kid+"'><span class='shadow'>" + list.cars[0].nickname + "</span>   popped   <span class='shadow'>" + list.cars[1].nickname + "</span></p>";
+        feed = "<p id='"+kid+"'>" + list.cars[0].nickname + "   popped   " + list.cars[1].nickname + "</p>";
     }
     else{
-        feed = "<p id='"+kid+"'><span class='shadow'>" + list.cars[1].nickname + "</span>  took the easy way out</p>";
+        feed = "<p id='"+kid+"'>" + list.cars[1].nickname + " took the easy way out</p>";
     }
         $("#killfeed").prepend(feed);
     
@@ -917,8 +919,8 @@ socket.on('update', function(lists) {
             }
             // If it wasn't found add the new player to our array
             if (!found) {
-                otherCar = $('<div id="oppCar" class="opponentCar"><div class="pin"></div><div class="balloon"></div></div><div id="oppName" class="player_name">' + updatingCar.nickname + '</div>').appendTo("#map");
-                var newCar = new MoveSprite(otherCar);
+                otherCar = $('<div id="'+ updatingCar.id +'" class="opponentCar"><div class="pin"></div><div class="balloon"></div></div><div id="'+updatingCar.nickname+'" class="player_name">' + updatingCar.nickname + '</div>').appendTo("#map");
+                var newCar = new MoveSprite(otherCar, updatingCar.id, updatingCar.nickname);
                 newCar.setSpeed(10);
                 newCar.setPos(updatingCar.x, updatingCar.y);
                 newCar.orientation = updatingCar.orientation;
