@@ -13,6 +13,12 @@ $('#enter_link').click(function() {
     socket.emit('new client', nickname);
 });
 
+$('#tut').click(function() {
+    $('#tut').hide();
+    $('.login').hide();
+    $('#tips').show();
+});
+
 document.body.addEventListener("keydown", function(e) {
     if (!e) {
         var e = window.event;

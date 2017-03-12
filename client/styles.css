@@ -29,8 +29,15 @@ div {
 
 #tut{
     color:white;
-    left: 37%;
     top: 40%;
+    position: absolute;
+}
+#tut:hover{
+    color:blue;
+}
+
+#tips{
+   margin-top: 50px;
 }
 
 #gameView {
