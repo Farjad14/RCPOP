@@ -591,7 +591,7 @@ function setKillHud(msg){
     $("#killHud").fadeIn(500);
     setTimeout(function(){
             $("#killHud").fadeOut(1000);
-        }, 3000);
+        }, 1000);
 }
 
 //game loop
