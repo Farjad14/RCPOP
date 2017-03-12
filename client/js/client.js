@@ -19,6 +19,12 @@ $('#tut').click(function() {
     $('#tips').show();
 });
 
+$('#tips').click(function() {
+    $('#tut').show();
+    $('.login').show();
+    $('#tips').hide();
+});
+
 document.body.addEventListener("keydown", function(e) {
     if (!e) {
         var e = window.event;
