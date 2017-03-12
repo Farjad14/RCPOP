@@ -813,7 +813,7 @@ socket.on('update', function(lists) {
         return;
     }
 
-    lboard = "Scoreboard<br/>";
+    lboard = "<h2>Scoreboard</h2>";
 
     //Update Leaderboard
     for (i = 0; i < lists.cars.length; i++) {
