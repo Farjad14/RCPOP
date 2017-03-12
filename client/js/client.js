@@ -540,6 +540,15 @@ function detectCollision() {
 
 
 
+function setKillHud(){
+    f =  "<h1> +1 Kill</h>"; 
+    $("#killHud").html(f);
+    $("#killHud").fadeIn(500);
+    setTimeout(function(){
+            $("#killHud").fadeOut(1000);		
+        }, 2000);
+}
+
 //game loop
 /////////////////////
 function gameLoop(fps) {
@@ -834,7 +843,9 @@ socket.on('update', function(lists) {
                     sprite.orientation = updatingCar.orientation;
 
                 }
-
+                if(sprite.score < updatingCar.score){
+                    setKillHud();
+                }
                 sprite.setScore(updatingCar.score);
                 sprite.setSpeed(updatingCar.speed);
                 still_alive = 1;
