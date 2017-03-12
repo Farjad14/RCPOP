@@ -317,3 +317,8 @@ div {
   color:white;
   margin: 0px;
 }
+
+#killHud {
+  top: 15%;
+  left: 50%;
+}
