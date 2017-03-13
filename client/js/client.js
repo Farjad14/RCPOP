@@ -890,12 +890,14 @@ socket.on('killfeed', function(list) {
         $("#"+kid).fadeOut(1000);		
           if ($("#"+kid-MAX_FEED_LENGTH-1)) {		
             $("#"+kid-MAX_FEED_LENGTH-1).remove();
-        }         
-    }, 3000);
-    //cleanup
+            //cleanup
     if ( kid % 5 == 0 ){
+        console.log("clear");
         $("#killfeed").empty();
     }
+        }         
+    }, 3000);
+    
         
 });
 
