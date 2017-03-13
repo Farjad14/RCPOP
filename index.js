@@ -612,8 +612,8 @@ function detectPop(sprite) {
         tipx = sprite.x + (Math.sin(toRadians(sprite.orientation)) * 100);
         tipy = sprite.y - (Math.cos(toRadians(sprite.orientation)) * 100);
 
-        //if the distance between the ballon of cars[i] and the tip of cars[j] is less than radius = 50
-        if ((Math.pow(balloonx - tipx, 2) + Math.pow(balloony - tipy, 2)) < Math.pow(75, 2)) {
+        //if the distance between the ballon of cars[i] and the tip of cars[j] is less than radius = 70
+        if ((Math.pow(balloonx - tipx, 2) + Math.pow(balloony - tipy, 2)) < Math.pow(70, 2)) {
             console.log("returning popped car");
             return cars[i];
         }
