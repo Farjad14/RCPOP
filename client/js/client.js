@@ -885,16 +885,16 @@ socket.on('killfeed', function(list) {
     $("#killfeed").prepend(feed);
 
     //animate
-    $("#"+kid).fadeIn(500);
+    $("#killfeed").fadeIn(500);
     setTimeout(function(){
-        $("#"+kid).fadeOut(1000);		
+        $("#killfeed").fadeOut(1000);		
           if ($("#"+kid-MAX_FEED_LENGTH-1)) {		
             $("#"+kid-MAX_FEED_LENGTH-1).remove();
             //cleanup
-    if ( kid % 3 == 0 ){
+    /*if ( kid % 3 == 0 ){
         console.log("clear");
         $("#killfeed").empty();
-    }
+    }*/
         }         
     }, 3000);
     
