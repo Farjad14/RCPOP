@@ -13,14 +13,14 @@ The server listens on port 3000, so you have to mention the port number
 when you request pages from the server i.i. http://localhost:3000 for example if the server
 is running on your machine.
 
-This server sends updates to all clients once every 50ms. 
+This server sends updates to all clients once every 30ms. 
 The server recieves updates from connected clients asynchronously. Meaning, at any time, 
 a client can send updates to this server in the form of socket.io tagged messages. 
 The messages from the client can contain position information and other types of information. 
 */
 
 
-// constants that define fixed quantities in our program
+/*-----------  Constants ----------- */
 const carWidth = 100;
 const carHeight = 100;
 const map_width = 5000;
@@ -31,21 +31,11 @@ const PERC_GAIN = 1 / 4;
 const BASE_GAIN = 0.25;
 const MAX_SPEED = 16;
 const PUP_SPEED = 3;
+const PUP_TIME = 4;
 const EXPLOSION_KILL_RANGE = 470;
 
 
-//global variables that define variant quantities in our program
-var numOfClients = 0; //initially zero
-
-
-// type 1 and type 2 power up variables that track time intervals through timestamps
-//basically new power ups are created every some interval (depending on the type of the power up)
-//and these power ups are only spawned again that interval is gone by. 
-var Type1Pup = 0;
-var Type2Pup = 0;
-var Type3Pup = 0;
-
-
+/* ----------- Constructors ----------- */
 
 //this is a constructor to create a car object. 
 car = function(x, y, orientation) {
@@ -92,16 +82,28 @@ powerUp = function(x, y, type) {
     return self;
 }
 
+
+/* ----------- Global variables ----------- */
+
 //a list that holds all powerUp objects on the map
 powerUps = [];
-
-
 //a list that holds all cars on the map
 cars = [];
-
 //a list for dead cars that were popped in the current round -  30ms
 deadCars = [];
 
+var numOfClients = 0; //initially zero
+
+
+// type 1 and type 2 power up variables that track time intervals through timestamps
+//basically new power ups are created every some interval (depending on the type of the power up)
+//and these power ups are only spawned again that interval is gone by. 
+var Type1Pup = 0;
+var Type2Pup = 0;
+var Type3Pup = 0;
+
+
+/* ----------- Server Init ----------- */
 
 //instantiate the express module and use it to build an http server. 
 var express = require('express');
@@ -119,7 +121,6 @@ app.get('/', function(req, res) {
 app.use('/', express.static(__dirname + '/client'));
 
 
-
 // instantiate the filesystem object to read a pattern of bad words from file list.txt
 fs = require('fs')
 var regex;
@@ -129,6 +130,9 @@ fs.readFile('list.txt', 'utf8', function(err, data) {
     }
     regex = data;
 });
+
+
+/* ----------- Client Conection and all socket funcitons ----------- */
 
 //connection event from a socket.io client. This event is triggered when 
 //a socket.io client first connects to this server - so once per connection request
@@ -272,16 +276,12 @@ io.on('connection', function(socket) {
 
     });
 
-
-
     /*
     Upon the receit of a power up notification, this handler is invoced to process it
     It confirms whether the power up was indeed consumed by srcCar and applies power up effects 
     accroding to the type of power up consumed by srcCar
     */
     socket.on('powerUp', function(srcCarData) {
-           
-
             
         //find the car object for the car the sent the collision event
         var srcCar = findCarById(srcCarData.id);
@@ -296,32 +296,31 @@ io.on('connection', function(socket) {
 
             //if the two collision are too close - within 50ms, ignore the second one
             if(srcCar.curPUPStamp - srcCar.prevPUPStamp < 250){ //return - multiple notfications for same power up
-          return;
-        }
+              return;
+            }
         
         console.log('potential powerup event');
         
         ridPowerUp(srcCarData); // marks powerup as consumed =1
-        
-        //remove effect of previous power up from srcCar
-        removePupEffct(srcCar);
+        removePupEffct(srcCar); //remove effect of previous power up from srcCar
         
         //update power up flag as sent
         if(srcCarData.type == 1) {srcCar.powerUp=1;}
         if(srcCarData.type == 2) {srcCar.powerUp=2;}
         if(srcCarData.type == 3) {srcCar.powerUp=3;}
         
-        
-        if (srcCar.powerUp == 1) {
-            //this is a power down
+        if (srcCar.powerUp == 1) { // Speed down power down
             srcCar.speed -= PUP_SPEED;
             //set start timer for power up
-            srcCar.pUpTimerStart = Math.floor(Date.now() / 1000); //lasts for 10 seconds    
+            srcCar.pUpTimerStart = Math.floor(Date.now() / 1000); 
             console.log('power up type 1 applied');
         } 
-        
-        else if (srcCar.powerUp == 3) {
-            //we have only 1 of this power ups -  so this gotta be the special power up 
+        else if (srcCar.powerUp == 2) { // Speed up power up
+          srcCar.speed += PUP_SPEED;
+          srcCar.pUpTimerStart = Math.floor(Date.now() / 1000);
+          console.log('power up type 2 applied');
+        }
+        else if (srcCar.powerUp == 3) { // Explosion power up
             var score = 0;
             for (i = 0; i < cars.length; i++) {
               if ((Math.pow(cars[i].x - srcCar.x, 2) + Math.pow(cars[i].y - srcCar.y, 2)) <
@@ -333,24 +332,10 @@ io.on('connection', function(socket) {
               }
             }
             srcCar.score += score;
+            updateLeaderboard();
             
             console.log('power up type 3 applied');
         } 
-        
-        else if (srcCar.powerUp == 2) {
-          //we have 4 of this power up - once consumed, your car gains temporary speed 
-
-          srcCar.speed += PUP_SPEED;
-          if (srcCar.speed > MAX_SPEED) {
-              srcCar.speed = MAX_SPEED;
-              
-          }
-          //this power up lasts for 6 seconds ******* set start timer
-          srcCar.pUpTimerStart = Math.floor(Date.now() / 1000);
-          console.log('power up type 2 applied');
-        }
-        
-
     }); 
 
 
@@ -448,7 +433,7 @@ io.on('connection', function(socket) {
 
                 //increase car's speed by a percent of the killed cars speed plus base amount
                 srcCar.speed += BASE_GAIN;// + (deadCar.speed - 10) * PERC_GAIN; //check they have power up first
-                srcCar.speed += BASE_GAIN;// + (deadCar.speed - 10) * PERC_GAIN; //check they have power up first
+                
                 if (srcCar.speed > MAX_SPEED) {
                     srcCar.speed = MAX_SPEED;
                 }
@@ -467,11 +452,12 @@ function setKillFeed(srcCar, deadCar){
     console.log("sent killfeed info");
 }
 
+/* Finds the power ups the car has collided with and mark it as consumed*/
 function ridPowerUp(srcCarData){
     for (i = 0; i < powerUps.length; i++) {
         if (powerUps[i].x == srcCarData.x && powerUps[i].y == srcCarData.y 
         && powerUps[i].type == srcCarData.type ){
-            powerUps[i].consumed =1;
+            powerUps[i].consumed = 1;
         }
     }
     
@@ -504,6 +490,7 @@ function findCarById(carId) {
     return null;
 }
 
+// Remove the power up effect on the current car
 function removePupEffct(srcCar) {
     //removes effects of power ups from srcCar, clear flag and reset speed
     if (srcCar.powerUp == 1) {
@@ -525,7 +512,7 @@ function removePupEffct(srcCar) {
 }
 
 /*
-removes all cars in the cars list that marked dead, i.e car.alive = 0
+removes all cars in the cars list that are marked dead, i.e car.alive = 0
 */
 function removeDeadCars() {
 
@@ -612,16 +599,12 @@ function detectPop(sprite) {
 
 /*
 a function that runs every interval = 50ms - broadcasts all information on server 
-to all connected clients 
+to all connected clients and update both the cars list and the power ups list
 */
 function updateClients() {
-    //console.log("sending updates to clients");
-    //determine all collisions and update both the cars list and the power ups list
-
+  
     removeDeadCars(); // popped cars get removed 
-
     //removeConsumedPowerUps(); //consumed power ups get removed
-
     checkCarpUps(); //clear power ups - for expired power ups before broadcasting
 
     //time to refill all type 1 power ups? - 60 seconds have passed since last time? 
@@ -632,10 +615,8 @@ function updateClients() {
             if (powerUps[i].type == 1) {
               powerUps[i].consumed = 0;
             }
-        }
-        
+        }      
     }
-
 
     //time to refill all type 2 power ups? - 40 seconds have passed since last time? 
     if (Math.floor(Date.now() / 1000) - Type2Pup > 40) {
@@ -645,10 +626,8 @@ function updateClients() {
             if (powerUps[i].type == 2) {
                 powerUps[i].consumed = 0;
             }
-        }
-      
+        }   
     }
-
 
     //time to refill all type 3 power ups? - 60 seconds have passed since last time? 
     if (Math.floor(Date.now() / 1000) - Type3Pup > 60) {
@@ -675,11 +654,7 @@ function updateClients() {
     clearCollisionFlags();
 }
 
-
-
 setInterval(updateClients, 30);
-
-
 
 /*
 clear collision flags for next round of collision detection.
@@ -765,40 +740,31 @@ function removeConsumedPowerUps() {
 function checkCarpUps() {
 
     for (i = 0; i < cars.length; i++) {
-        if (cars[i].powerUp == 1) { //the ppower down that should last for 10 seconds
-            if (Math.floor(Date.now() / 1000) - cars[i].pUpTimerStart > 4) {
-                cars[i].powerUp = 0;
-                cars[i].speed = speed + cars[i].score;
-            }
+        if (cars[i].powerUp == 0) {
+            continue;
         }
-
-        if (cars[i].powerUp == 3) {
+        else if (cars[i].powerUp == 3) {
             cars[i].powerUp = 0;
-
-        }
-
-        if (cars[i].powerUp == 2) {
-
-            if (Math.floor(Date.now() / 1000) - cars[i].pUpTimerStart > 4) {
-                cars[i].powerUp = 0; //clear power up flag
-                //reset speed 
-                cars[i].speed = speed + cars[i].score;
-                //clamp speed
-                if (cars[i].speed > MAX_SPEED) {
-                    cars[i].speed = MAX_SPEED;
-                }
+        } else if (cars[i].powerUp == 1) {
+            if (Math.floor(Date.now() / 1000) - cars[i].pUpTimerStart > PUP_TIME) {
+                removePupEffct(cars[i]);
             }
-
         }
+        else if (cars[i].powerUp == 2) {
+            if (Math.floor(Date.now() / 1000) - cars[i].pUpTimerStart > PUP_TIME) {
+                removePupEffct(cars[i]);
+            }
+        }
+        
     }
-
 }
+
+
 /*
 Three comparisons are done: 
 if tip of car1 within radius of body of car2, 
 if tip of car2 within radius of body of car1,
 if the two needles intersect using equations of lines - not implemented. 
-
 */
 function detectCollision(srcCar) {
     for (i = 0; i < cars.length; i++) {
