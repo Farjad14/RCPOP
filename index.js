@@ -252,7 +252,7 @@ io.on('connection', function(socket) {
             cars[i].alive = 0;
             
             //Set suicide message to killfeed
-            setKillFeed(null, cars[i]);
+            setKillFeed(null, cars[i], "out of bounds");
         }
         
         //car travelled too big a distance between two consective location upates
@@ -335,7 +335,7 @@ io.on('connection', function(socket) {
                   speedInc += BASE_GAIN + stolen_speed * PERC_GAIN;
                   // calculate score increase
                   score++;
-                  setKillFeed(srcCar, cars[i]); // announce death
+                  setKillFeed(srcCar, cars[i], "explosion"); // announce death
                   
               }
             }
@@ -443,7 +443,7 @@ io.on('connection', function(socket) {
                 deadCar.alive = 0;
                 
                 //Update kill feed
-                setKillFeed(srcCar, deadCar);
+                setKillFeed(srcCar, deadCar, "pop");
 
                 //increase car's speed by a percent of the killed cars speed plus base amount
                 var stolen_speed = (deadCar.speed - 10);
@@ -473,8 +473,8 @@ io.on('connection', function(socket) {
 
 
 // Send information of a death to all clients
-function setKillFeed(srcCar, deadCar){
-    io.emit("killfeed", {cars : [srcCar, deadCar]});
+function setKillFeed(srcCar, deadCar, causeOfDeath){
+    io.emit("killfeed", {cars: [srcCar, deadCar], cod: causeOfDeath});
     console.log("sent killfeed info");
 }
 

@@ -846,13 +846,16 @@ socket.on('id', function(newCar) {
 socket.on('killfeed', function(list) {
     kid++;
     var feed = "";
-    if(list.cars[0] != null){
-        
+    if(list.cod === "pop"){
         feed = "<p id='"+kid+"'>" + list.cars[0].nickname + "   popped   " + list.cars[1].nickname + "</p>";
     }
-    else{
+    else if (list.cod === "out of bounds"){
         feed = "<p id='"+kid+"'>" + list.cars[1].nickname + " took the easy way out</p>";
+    } else if (list.cod === "explosion") {
+      feed = "<p id='"+kid+"'>" + list.cars[0].nickname + "   blew up   " + list.cars[1].nickname + "</p>";
+      
     }
+    
         $("#killfeed").prepend(feed);
     
         $("#"+kid).fadeIn(500);
