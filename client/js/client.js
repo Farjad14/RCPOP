@@ -62,7 +62,7 @@ var mouse_y = 0;
 //init end
 
 //define constants		
-const MAX_FEED_LENGTH = 10;
+const MAX_FEED_LENGTH = 5;
 
 
 //utility functions
@@ -882,20 +882,15 @@ socket.on('killfeed', function(list) {
     }
     
     //add to killfeed
-    $("#killfeed").prepend(feed);
-
+    $("#killfeed").append(feed);
+    if (kid > MAX_FEED_LENGTH){
+        //$("#killfeed").empty();
+        $("#"+(kid - MAX_FEED_LENGTH)).remove();
+    } 
     //animate
     $("#killfeed").fadeIn(500);
     setTimeout(function(){
-        $("#killfeed").fadeOut(1000);		
-          if ($("#"+kid-MAX_FEED_LENGTH-1)) {		
-            $("#"+kid-MAX_FEED_LENGTH-1).remove();
-            //cleanup
-    /*if ( kid % 3 == 0 ){
-        console.log("clear");
-        $("#killfeed").empty();
-    }*/
-        }         
+        $("#killfeed").fadeOut(1000);       
     }, 3000);
     
         
