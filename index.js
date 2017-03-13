@@ -301,7 +301,10 @@ io.on('connection', function(socket) {
         
         console.log('potential powerup event');
         
-        ridPowerUp(srcCarData); // marks powerup as consumed =1
+        if (!consumePowerUp(srcCarData)) { //check and consume the powerUp
+            console.log("That power up doesn't exist");
+            return;
+        } // marks powerup as consumed =1
         removePupEffct(srcCar); //remove effect of previous power up from srcCar
         
         //update power up flag as sent
@@ -313,12 +316,10 @@ io.on('connection', function(socket) {
             srcCar.speed -= PUP_SPEED;
             //set start timer for power up
             srcCar.pUpTimerStart = Math.floor(Date.now() / 1000); 
-            console.log('power up type 1 applied');
         } 
         else if (srcCar.powerUp == 2) { // Speed up power up
           srcCar.speed += PUP_SPEED;
           srcCar.pUpTimerStart = Math.floor(Date.now() / 1000);
-          console.log('power up type 2 applied');
         }
         else if (srcCar.powerUp == 3) { // Explosion power up
             var score = 0;
@@ -348,39 +349,7 @@ io.on('connection', function(socket) {
             srcCar.score += score;
             updateLeaderboard();
             
-            console.log('power up type 3 applied');
         } 
-        /* Kill Code to be used for testing purposes only please don't abuse
-        else if (srcCarData.type == 42) {
-          var score = 0;
-            var speedInc = 0;
-            for (i = 0; i < cars.length; i++) { // Kill all cars in range
-              if ((Math.pow(cars[i].x - srcCar.x, 2) + Math.pow(cars[i].y - srcCar.y, 2)) <
-                  Math.pow(EXPLOSION_KILL_RANGE*5, 2) && (srcCar.id != cars[i].id)) {
-                  cars[i].alive = 0;
-                  
-                  // Calculate increased speed
-                  var stolen_speed = (cars[i].speed - 10);
-                  if (cars[i].powerUp == 1) stolen_speed += PUP_SPEED;
-                  else if (cars[i].powerUp == 2) stolen_speed -= PUP_SPEED;
-                  speedInc += BASE_GAIN + stolen_speed * PERC_GAIN;
-                  // calculate score increase
-                  score++;
-                  setKillFeed(srcCar, cars[i], "explosion"); // announce death
-                  
-              }
-            }
-            // increase car's speed for kills and check max speed
-            srcCar.speed += speedInc;
-            if (srcCar.speed > MAX_SPEED) {
-                srcCar.speed = MAX_SPEED;
-            }
-            // Increase score
-            srcCar.score += score;
-            updateLeaderboard();
-            
-            console.log('Kill code active');
-        } */
     }); 
 
 
@@ -509,15 +478,19 @@ function setKillFeed(srcCar, deadCar, causeOfDeath){
     console.log("sent killfeed info");
 }
 
-/* Finds the power ups the car has collided with and mark it as consumed*/
-function ridPowerUp(srcCarData){
+/*
+ Finds the power ups the car has collided with and mark it as consumed. 
+ Return True if the powerUp was found and return False if it wasn't.
+ */
+function consumePowerUp(srcCarData){
     for (i = 0; i < powerUps.length; i++) {
         if (powerUps[i].x == srcCarData.x && powerUps[i].y == srcCarData.y 
         && powerUps[i].type == srcCarData.type ){
             powerUps[i].consumed = 1;
+            return true
         }
     }
-    
+    return false
 }
 
 // Compare function that checks which score is greater between car a and b
