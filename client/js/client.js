@@ -876,7 +876,7 @@ socket.on('killfeed', function(list) {
         if(list.cod === "pop") {
             feed += killer + "      popped      " + killed + "</p>";
         } else if (list.cod === "explosion") { 
-            feed += killer + "   blew up   " + killed + "</p>";
+            feed += killer + "   blew up   " + killed + "'s balloon</p>";
       
         }
     }
@@ -933,16 +933,16 @@ socket.on('update', function(lists) {
                 }
                 var diff = updatingCar.score - sprite.score;
                 if(diff ==1){
-                    setKillHud( "<h1> +1 Kill</h>");
+                    setKillHud( "<h1> +1 single elemination</h>");
                 }
                 else if(diff ==2){
-                    setKillHud( "<h1> +2 Double Kill!</h>");
+                    setKillHud( "<h1> +2 DOUBLE ELEMINATION!</h>");
                 }
                 else if(diff ==3){
-                    setKillHud( "<h1> +3 Triple Kill!</h>");
+                    setKillHud( "<h1> +3 TRIPLE ELEMINATION!</h>");
                 }
                 else if(diff >3) {
-                    setKillHud( "<h1> +"+diff+" Multi Kill!</h>");
+                    setKillHud( "<h1> +"+diff+" MULTI ELEMINATION!</h>");
                 }
                 sprite.setScore(updatingCar.score);
                 sprite.setSpeed(updatingCar.speed);
@@ -1099,6 +1099,7 @@ socket.on('update', function(lists) {
             if ((Math.abs(lists.deadCars[i].x - sprite.x) < w) && (Math.abs(lists.deadCars[i].y - sprite.y) < h)) {
                 $("#popped").get(0).play();
                 console.log("audio played");
+                break;
             }
 
         }
