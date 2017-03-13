@@ -23,14 +23,14 @@ The messages from the client can contain position information and other types of
 // constants that define fixed quantities in our program
 const carWidth = 100;
 const carHeight = 100;
-const speed = 10; // 10 pixels per milliseconds.
 const map_width = 5000;
 const map_height = 5000;
+const speed = 10; // 10 pixels per milliseconds.
+const SPAWN_DIS = 350;
 const PERC_GAIN = 1 / 4;
 const BASE_GAIN = 0.25;
 const MAX_SPEED = 16;
-const SPEEDPUP3 = 3;
-const SPEEDPUP1 = 3;
+const PUP_SPEED = 3;
 const EXPLOSION_KILL_RANGE = 470;
 
 
@@ -134,7 +134,7 @@ fs.readFile('list.txt', 'utf8', function(err, data) {
 //a socket.io client first connects to this server - so once per connection request
 io.on('connection', function(socket) {
     console.log('a user connected');
-
+    
     //disconnect event -  a client disconnected
     socket.on('disconnect', function() {
         console.log('user disconnected');
@@ -243,6 +243,14 @@ io.on('connection', function(socket) {
             return;
         }
 
+        //Check if car goes off map
+        if (data.x > map_width || data.x < 0 || data.y > map_height || data.y < 0) { //out of bounds, dead
+            cars[i].alive = 0;
+            
+            //Set suicide message to killfeed
+            setKillFeed(null, cars[i]);
+        }
+        
         //car travelled too big a distance between two consective location upates
         if ((Math.pow(srcCar.x - data.x, 2) + Math.pow(srcCar.y - data.y, 2)) >
             Math.pow(6 * srcCar.speed, 2)) {
@@ -260,15 +268,7 @@ io.on('connection', function(socket) {
         //update the current paramters of the car
         srcCar.x = data.x;
         srcCar.y = data.y;
-        srcCar.orientation = data.orientation;
-             
-        //Check if car goes off map
-        if (data.x > map_width || data.x < 0 || data.y > map_height || data.y < 0) { //out of bounds, dead
-            cars[i].alive = 0;
-            
-            //Set suicide message to killfeed
-            setKillFeed(null, cars[i]);
-        }
+        srcCar.orientation = data.orientation;      
 
     });
 
@@ -301,10 +301,6 @@ io.on('connection', function(socket) {
         
         console.log('potential powerup event');
         
-        //check to see if the car has indeed consumed a power and if it has, set the powerUp field
-        //to the type of the power - a number - and mark the powerUP object as consumed
-        //detectCarPowerupCollisions(srcCar, srcCarData); //this function does all of the above
-        
         ridPowerUp(srcCarData); // marks powerup as consumed =1
         
         //remove effect of previous power up from srcCar
@@ -318,32 +314,33 @@ io.on('connection', function(socket) {
         
         if (srcCar.powerUp == 1) {
             //this is a power down
-            //reduce rotation speed of car by SPEEDPUP1
-            srcCar.rotateUnit -= SPEEDPUP1; //-4
-            //reduce speed of car by SPEEDPUP3
-            srcCar.speed -= SPEEDPUP3; //-3
+            srcCar.speed -= PUP_SPEED;
             //set start timer for power up
             srcCar.pUpTimerStart = Math.floor(Date.now() / 1000); //lasts for 10 seconds    
             console.log('power up type 1 applied');
         } 
         
         else if (srcCar.powerUp == 3) {
-             //we have only 1 of this power ups -  so this gotta be the special power up 
-           
+            //we have only 1 of this power ups -  so this gotta be the special power up 
+            var score = 0;
             for (i = 0; i < cars.length; i++) {
-                if ((Math.pow(cars[i].x - srcCar.x, 2) + Math.pow(cars[i].y - srcCar.y, 2)) <
-                    Math.pow(EXPLOSION_KILL_RANGE, 2) && (srcCar.id != cars[i].id)) {
-                    cars[i].alive = 0;
-                    
-                }
+              if ((Math.pow(cars[i].x - srcCar.x, 2) + Math.pow(cars[i].y - srcCar.y, 2)) <
+                  Math.pow(EXPLOSION_KILL_RANGE, 2) && (srcCar.id != cars[i].id)) {
+                  cars[i].alive = 0;
+                  score++;
+                  setKillFeed(srcCar, cars[i]);
+                  
+              }
             }
+            srcCar.score += score;
+            
             console.log('power up type 3 applied');
         } 
         
         else if (srcCar.powerUp == 2) {
           //we have 4 of this power up - once consumed, your car gains temporary speed 
-   
-          srcCar.speed += SPEEDPUP3; //+3
+
+          srcCar.speed += PUP_SPEED;
           if (srcCar.speed > MAX_SPEED) {
               srcCar.speed = MAX_SPEED;
               
@@ -450,7 +447,8 @@ io.on('connection', function(socket) {
                 setKillFeed(srcCar, deadCar);
 
                 //increase car's speed by a percent of the killed cars speed plus base amount
-                srcCar.speed += 1;//(deadCar.speed - 10) * PERC_GAIN + BASE_GAIN;
+                srcCar.speed += BASE_GAIN;// + (deadCar.speed - 10) * PERC_GAIN; //check they have power up first
+                srcCar.speed += BASE_GAIN;// + (deadCar.speed - 10) * PERC_GAIN; //check they have power up first
                 if (srcCar.speed > MAX_SPEED) {
                     srcCar.speed = MAX_SPEED;
                 }
@@ -459,11 +457,11 @@ io.on('connection', function(socket) {
             }
         }
     });
-
-
-
 });
 
+
+
+// Send information of a death to all clients
 function setKillFeed(srcCar, deadCar){
     io.emit("killfeed", {cars : [srcCar, deadCar]});
     console.log("sent killfeed info");
@@ -479,6 +477,7 @@ function ridPowerUp(srcCarData){
     
 }
 
+// Compare function that checks which score is greater between car a and b
 function compare(a, b) {
     if (a.score > b.score)
         return -1;
@@ -487,6 +486,7 @@ function compare(a, b) {
     return 0;
 }
 
+// Sorts all cars by score (highest to lowest)
 function updateLeaderboard() {
     cars.sort(compare);
 }
@@ -504,29 +504,23 @@ function findCarById(carId) {
     return null;
 }
 
-function removePupEffct(srcCar){
-    //removes effects of other power ups from cars[i]
-    if (srcCar.powerUp == 1) { //the power down that should last for 10 seconds
+function removePupEffct(srcCar) {
+    //removes effects of power ups from srcCar, clear flag and reset speed
+    if (srcCar.powerUp == 1) {
         srcCar.powerUp = 0;
-        srcCar.rotateUnit += SPEEDPUP1;
-        srcCar.speed = speed + srcCar.score;
-    }
-    //if cars[i] has power up of type 3, clear it before adding the effects
-    if (srcCar.powerUp == 3) {
-        srcCar.powerUp = 0;
-    }
-    
-    //if cars[i] has power up of type 2, clear it
-    if (srcCar.powerUp == 2) {
-
-        srcCar.powerUp = 0; //clear power up flag
-        //reset speed 
-        srcCar.speed = speed + srcCar.score;
+        srcCar.speed += PUP_SPEED;
         //clamp speed
         if (srcCar.speed > MAX_SPEED) {
             srcCar.speed = MAX_SPEED;
         }
     }
+    if (srcCar.powerUp == 2) {
+        srcCar.powerUp = 0;
+        srcCar.speed -= PUP_SPEED;      
+    }
+    if (srcCar.powerUp == 3) {
+        srcCar.powerUp = 0;
+    } 
     
 }
 
@@ -543,6 +537,7 @@ function removeDeadCars() {
     }
 }
 
+// Picks a random location not to close to the edges of the map
 function generateRandomLoc() {
     var x = Math.floor(Math.random() * 4500) + 250;
     var y = Math.floor(Math.random() * 4500) + 250;
@@ -552,25 +547,29 @@ function generateRandomLoc() {
     };
 }
 
-//generate random position
+/* 
+ Picks a random location on the map where no car is within 350 pixels.
+ Also picks a random orientation for new car to be facing.
+ */
 function generateSpawnLoc() {
     var loc = generateRandomLoc();
 
     // check that all cars aren't to close to the new spawn point
     // This is a conditional loop not a counted loop
     for (i = 0; i < cars.length; i++) {
-        if (cars[i].x + 350 > loc.x) continue;
-        if (cars[i].x - 350 < loc.x) continue;
-        if (cars[i].y + 350 > loc.y) continue;
-        if (cars[i].y - 350 < loc.y) continue;
+        if (cars[i].x + SPAWN_DIS > loc.x) continue;
+        if (cars[i].x - SPAWN_DIS < loc.x) continue;
+        if (cars[i].y + SPAWN_DIS > loc.y) continue;
+        if (cars[i].y - SPAWN_DIS < loc.y) continue;
 
         // Too close to a car, resart the loop with new location
         loc = generateRandomLoc();
         i = 0;
     }
 
+    // Face in a random location
     var orientation = Math.floor(Math.random() * 360);
-    return {
+    return { // return the spawn information
         x: loc.x,
         y: loc.y,
         orientation: orientation
@@ -612,82 +611,12 @@ function detectPop(sprite) {
 
 
 /*
-This functin detects if a certain car has consumed a power up
-goes through all available poewr ups in the game and find one if exists that's been consumed by
-srcCar
-*/
-function detectCarPowerupCollisions(srcCar) {
-
-    for (j = 0; j < powerUps.length; j++) {
-        //for (i = 0; i < cars.length; i++) {
-        
-            if (powerUps[j].consumed == 0) { //if the power up isn't consumed, proceed
-                //check distance between center of power up and center of car 
-    
-                    //a power up is a square with 25 x 25 dimensions
-                    if ((Math.pow(cars[i].x - powerUps[j].x, 2) +
-                            Math.pow(cars[i].y - powerUps[j].y, 2)) < Math.pow(50, 2)) {
-                        console.log("power up event");
-                        
-                        //removes effects of other power ups from cars[i]
-                        if (cars[i].powerUp == 1) { //the power down that should last for 10 seconds
-                            cars[i].powerUp = 0;
-                            cars[i].rotateUnit += SPEEDPUP1;
-
-                        }
-                        //if cars[i] has power up of type 3, clear it before adding the effects
-                        if (cars[i].powerUp == 3) {
-                            cars[i].powerUp = 0;
-                        }
-                        
-                        //if cars[i] has power up of type 2, clear it
-                        if (cars[i].powerUp == 2) {
-
-                            cars[i].powerUp = 0; //clear power up flag
-                            //reset speed 
-                            cars[i].speed = speed + cars[i].score;
-                            //clamp speed
-                            if (cars[i].speed > MAX_SPEED) {
-                                cars[i].speed = MAX_SPEED;
-                            }
-                        }
-
-                        //set the power up flag of cars[i]    
-                        if (powerUps[j].type == 1) {
-                            cars[i].powerUp = 1; //car gets the power up
-
-                        } 
-                        else if (powerUps[j].type == 2) {
-                            cars[i].powerUp = 2; //car gets the power up    
-                        } 
-                        else if (powerUps[j].type == 3) {
-                            cars[i].powerUp = 3; //car gets the power up    
-                        }
-                        
-                        powerUps[j].consumed = 1; //power up is consumed
-                    }
-                
-
-                
-            }
-        //}    
-    }
-
-}
-
-
-/*
 a function that runs every interval = 50ms - broadcasts all information on server 
 to all connected clients 
 */
 function updateClients() {
     //console.log("sending updates to clients");
     //determine all collisions and update both the cars list and the power ups list
-
-    
-    //detectCarPowerupCollisions(); //see what cars got what power ups and set powerup flag
-    
-    //ApplyPowerUps();     //apply the effect of the obtained power ups. 
 
     removeDeadCars(); // popped cars get removed 
 
@@ -748,7 +677,7 @@ function updateClients() {
 
 
 
-setInterval(updateClients, 30); //should be 50
+setInterval(updateClients, 30);
 
 
 
@@ -839,7 +768,6 @@ function checkCarpUps() {
         if (cars[i].powerUp == 1) { //the ppower down that should last for 10 seconds
             if (Math.floor(Date.now() / 1000) - cars[i].pUpTimerStart > 4) {
                 cars[i].powerUp = 0;
-                cars[i].rotateUnit += SPEEDPUP1;
                 cars[i].speed = speed + cars[i].score;
             }
         }
