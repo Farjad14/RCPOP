@@ -322,15 +322,29 @@ io.on('connection', function(socket) {
         }
         else if (srcCar.powerUp == 3) { // Explosion power up
             var score = 0;
-            for (i = 0; i < cars.length; i++) {
+            var speedInc = 0;
+            for (i = 0; i < cars.length; i++) { // Kill all cars in range
               if ((Math.pow(cars[i].x - srcCar.x, 2) + Math.pow(cars[i].y - srcCar.y, 2)) <
                   Math.pow(EXPLOSION_KILL_RANGE, 2) && (srcCar.id != cars[i].id)) {
                   cars[i].alive = 0;
+                  
+                  // Calculate increased speed
+                  var stolen_speed = (cars[i].speed - 10);
+                  if (cars[i].powerUp == 1) stolen_speed += PUP_SPEED;
+                  else if (cars[i].powerUp == 2) stolen_speed -= PUP_SPEED;
+                  speedInc += BASE_GAIN + stolen_speed * PERC_GAIN;
+                  // calculate score increase
                   score++;
-                  setKillFeed(srcCar, cars[i]);
+                  setKillFeed(srcCar, cars[i]); // announce death
                   
               }
             }
+            // increase car's speed for kills and check max speed
+            srcCar.speed += speedInc;
+            if (srcCar.speed > MAX_SPEED) {
+                srcCar.speed = MAX_SPEED;
+            }
+            // Increase score
             srcCar.score += score;
             updateLeaderboard();
             
@@ -432,9 +446,21 @@ io.on('connection', function(socket) {
                 setKillFeed(srcCar, deadCar);
 
                 //increase car's speed by a percent of the killed cars speed plus base amount
-                srcCar.speed += BASE_GAIN;// + (deadCar.speed - 10) * PERC_GAIN; //check they have power up first
+                var stolen_speed = (deadCar.speed - 10);
+                if (deadCar.powerUp == 1) stolen_speed += PUP_SPEED;
+                else if (deadCar.powerUp == 2) stolen_speed -= PUP_SPEED;
+                srcCar.speed += BASE_GAIN + stolen_speed * PERC_GAIN;
                 
-                if (srcCar.speed > MAX_SPEED) {
+                // Check Max speed cap isn't exceeded
+                if (srcCar.powerUp == 1) {
+                    if (srcCar.speed > MAX_SPEED - PUP_SPEED) {
+                        srcCar.speed = MAX_SPEED - PUP_SPEED;
+                    }
+                } else if (srcCar.powerUp == 2) {
+                    if (srcCar.speed > MAX_SPEED + PUP_SPEED) {
+                        srcCar.speed = MAX_SPEED + PUP_SPEED;
+                    }
+                } else if (srcCar.speed > MAX_SPEED) {
                     srcCar.speed = MAX_SPEED;
                 }
                 srcCar.score++;
