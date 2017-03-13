@@ -936,8 +936,18 @@ socket.on('update', function(lists) {
                     sprite.orientation = updatingCar.orientation;
 
                 }
-                if(sprite.score < updatingCar.score){
+                var diff = updatingCar.score - sprite.score;
+                if(diff ==1){
                     setKillHud( "<h1> +1 Kill</h>");
+                }
+                else if(diff ==2){
+                    setKillHud( "<h1> +2 Double Kill!</h>");
+                }
+                else if(diff ==3){
+                    setKillHud( "<h1> +3 Triple Kill!</h>");
+                }
+                else if(diff >3) {
+                    setKillHud( "<h1> +"+diff+" Multi Kill!</h>");
                 }
                 sprite.setScore(updatingCar.score);
                 sprite.setSpeed(updatingCar.speed);
