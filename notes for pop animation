@@ -20,4 +20,8 @@
 
 - if our car is dead, line: 1046, we don't load the #splashscreen, we do balloon popping animation first 
 then we load #splashscreen	
+
+
+-lastly, to animate balloon pop, we need to have direct access to the balloon divs of the dead cars. This can 
+only be done if we assign id to them. each ballon div with have an id = nickname of its car. 
 	
