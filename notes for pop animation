@@ -1,0 +1,27 @@
+- we can't remove dead car from otherCars list right away - client.js line: 1082
+	
+	What we need to do here is leave the dead car in the otherCars list for a while until its pop 
+	animation is complete (the car won't move because it's dead).
+	
+	To do this, we first mark it as dead (sprite.dead property)
+	Then we set a flag, sprite.deathAnimation, to 1, we set it's ballon div background image to 
+	balloonPoping1.png, and then start a timer (store a time stamp in a property) that lasts for 200ms.
+	
+	after 200ms are gone, reset timer and load balloonPoping2.png
+
+	after 200ms are gone, reset timer and load balloonPoping3.png
+	
+	and so on, until all the animation sprites have been loaded. 
+	
+	Then remove the car from otherCars
+
+	
+	
+
+- if our car is dead, line: 1046, we don't load the #splashscreen, we do balloon popping animation first 
+then we load #splashscreen	
+
+
+-lastly, to animate balloon pop, we need to have direct access to the balloon divs of the dead cars. This can 
+only be done if we assign id to them. each ballon div with have an id = nickname of its car. 
+	
