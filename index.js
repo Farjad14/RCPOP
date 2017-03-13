@@ -350,6 +350,37 @@ io.on('connection', function(socket) {
             
             console.log('power up type 3 applied');
         } 
+        /* Kill Code to be used for testing purposes only please don't abuse
+        else if (srcCarData.type == 42) {
+          var score = 0;
+            var speedInc = 0;
+            for (i = 0; i < cars.length; i++) { // Kill all cars in range
+              if ((Math.pow(cars[i].x - srcCar.x, 2) + Math.pow(cars[i].y - srcCar.y, 2)) <
+                  Math.pow(EXPLOSION_KILL_RANGE*5, 2) && (srcCar.id != cars[i].id)) {
+                  cars[i].alive = 0;
+                  
+                  // Calculate increased speed
+                  var stolen_speed = (cars[i].speed - 10);
+                  if (cars[i].powerUp == 1) stolen_speed += PUP_SPEED;
+                  else if (cars[i].powerUp == 2) stolen_speed -= PUP_SPEED;
+                  speedInc += BASE_GAIN + stolen_speed * PERC_GAIN;
+                  // calculate score increase
+                  score++;
+                  setKillFeed(srcCar, cars[i], "explosion"); // announce death
+                  
+              }
+            }
+            // increase car's speed for kills and check max speed
+            srcCar.speed += speedInc;
+            if (srcCar.speed > MAX_SPEED) {
+                srcCar.speed = MAX_SPEED;
+            }
+            // Increase score
+            srcCar.score += score;
+            updateLeaderboard();
+            
+            console.log('Kill code active');
+        } */
     }); 
 
 
