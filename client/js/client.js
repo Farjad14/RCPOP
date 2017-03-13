@@ -5,10 +5,12 @@ var firstPowerUpPush = 0; //initial power up batch marker flag
 //kill id
 var kid = 0;
 
+var nickname = '';
+
 //UI
 $('#enter_link').click(function() {
     if (gameState != 0) return;
-    var nickname = $("#u").val();
+    nickname = $("#u").val();
     console.log(nickname);
     socket.emit('new client', nickname);
 });
@@ -846,15 +848,36 @@ socket.on('id', function(newCar) {
 socket.on('killfeed', function(list) {
     kid++;
     var feed = "";
+    //Car vs Car kill
     if(list.cars[0] != null){
-        
-        feed = "<p id='"+kid+"'>" + list.cars[0].nickname + "   popped   " + list.cars[1].nickname + "</p>";
+        //self vs enemy
+        if(list.cars[0].nickname == $("#my_name").text()){
+            feed = "<p id='"+kid+"'><span class='self'>" + list.cars[0].nickname + "</span>   popped   <span class='enemy'>" + list.cars[1].nickname + "</span></p>";
+        }
+        //enemy vs self
+        else if(list.cars[1].nickname == $("#my_name").text()){
+            feed = "<p id='"+kid+"'><span class='enemy'>" + list.cars[0].nickname + "</span>   popped   <span class='self'>" + list.cars[1].nickname + "</span></p>";
+        }
+        //enemy vs enemy
+        else{
+            feed = "<p id='"+kid+"'><span class='enemy'>" + list.cars[0].nickname + "</span>   popped   <span class='enemy'>" + list.cars[1].nickname + "</span></p>";
+        }
     }
+    //suicide
     else{
-        feed = "<p id='"+kid+"'>" + list.cars[1].nickname + " took the easy way out</p>";
+        //self suicide
+        if(list.cars[1].nickname == $("#my_name").text()){
+            feed = "<p id='"+kid+"'><span class='self'>" + list.cars[1].nickname + "</span> took the easy way out</p>";
+        }
+        //enemy suicide
+        else{
+            feed = "<p id='"+kid+"'><span class='enemy'>" + list.cars[1].nickname + "</span> took the easy way out</p>";
+        }
     }
+    //add to killfeed
         $("#killfeed").prepend(feed);
     
+    //animate
         $("#"+kid).fadeIn(500);
         setTimeout(function(){
             $("#"+kid).fadeOut(1000);		

@@ -306,6 +306,12 @@ div {
     border: 1px solid #4286f4;
     border-radius: 50%;
 }
+.enemy{
+    color:red;
+}
+.self{
+    color:green;
+}
 
 .player_name {
     position: absolute;
