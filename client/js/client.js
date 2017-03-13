@@ -891,7 +891,7 @@ socket.on('killfeed', function(list) {
           if ($("#"+kid-MAX_FEED_LENGTH-1)) {		
             $("#"+kid-MAX_FEED_LENGTH-1).remove();
             //cleanup
-    if ( kid % 5 == 0 ){
+    if ( kid % 3 == 0 ){
         console.log("clear");
         $("#killfeed").empty();
     }
@@ -1080,7 +1080,7 @@ socket.on('update', function(lists) {
             $("#finalScore").html("You scored: " + sprite.score);
             setTimeout(function(){ 
                 $("#splashscreen").fadeIn(500);
-            }, 700);
+            }, 1000);
 
         }
 
