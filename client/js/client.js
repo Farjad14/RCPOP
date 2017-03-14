@@ -6,12 +6,7 @@ var firstPowerUpPush = 0; //initial power up batch marker flag
 var kid = 0;
 
 var nickname = '';
-var entityMap = {'&': '&amp;','<': '&lt;','>': '&gt;','"': '&quot;',"'": '&#39;','/': '&#x2F;','`': '&#x60;','=': '&#x3D;'};
-function escapeHtml (string) {
-  return String(string).replace(/[&<>"'`=\/]/g, function (s) {
-    return entityMap[s];
-  });
-}
+
 
 //UI
 $('#enter_link').click(function() {
@@ -48,11 +43,24 @@ document.body.addEventListener("keydown", function(e) {
     }
 }, false);
 
+var entityMap = {'&': '&amp;','<': '&lt;','>': '&gt;','"': '&quot;',"'": '&#39;','/': '&#x2F;','`': '&#x60;','=': '&#x3D;'};
+var mapEntity = {'&amp;': '&','&lt;': '<','&gt;': '>','&quot;': '"','&#39;': "'",'&#x2F;': '/','&#x60;': '`','&#x3D;': '='};
+function escapeHtml (string) {
+  return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+    return entityMap[s];
+  });
+}
+function htmlDecode(input){
+  var e = document.createElement('div');
+  e.innerHTML = input;
+  return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+}
+
 $('#chatEntry').submit(function(){
         //sanitize
-            var msg = escapeHtml($('#m').val());
+          var msg = escapeHtml($('#m').val());
           socket.emit('chat message',{"name":$("#my_name").text(), "msg": msg});
-          console.log({"name":$("#my_name").text(), "msg": $('#m').val()});
+          console.log({"name":$("#my_name").text(), "msg": msg});
           $("#m").blur();
           $('#m').val('');
           $("#m").focus();
@@ -905,7 +913,7 @@ socket.on('id', function(newCar) {
 
 //Chat message
 socket.on('chat message', function(msg){
-          $('#messages').append($('<li>').text(msg));
+          $('#messages').append($('<li>').text(msg.name +": "+ htmlDecode(msg.msg)));
           var element = document.getElementById("messages");
             element.scrollTop = element.scrollHeight;
         });

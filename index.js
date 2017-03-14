@@ -165,7 +165,6 @@ io.on('connection', function(socket) {
     Make sure the nickname is valid - if not, return to client with an 'id' taggged message
     */
     socket.on('new client', function(nickname) {
-        nickname = escapeHtml(nickname);
         if (nickname.length > 12 || nickname.length == 0) {
             console.log('invalid length');
             socket.emit("id", null);
@@ -432,8 +431,7 @@ io.on('connection', function(socket) {
     
     //Chat message
     socket.on('chat message', function(msg){
-       var str = escapeHtml(msg.msg);
-        io.emit('chat message', msg.name +": "+str);
+        io.emit('chat message', msg);
     });
 
 
