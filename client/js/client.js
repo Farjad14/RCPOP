@@ -1078,17 +1078,18 @@ socket.on('update', function(lists) {
             
             firstPowerUpPush = 1;
         }
-        
+		
+			
+		 
         //not first batch of power ups - display only availabe ones - consumed = 0
         else if(firstPowerUpPush == 1){
-            
+			//update powerUps list to latest batch = lists.powerUps
+			powerUps = lists.powerUps;
+			
+			
             for (i = 0; i < powerUps.length; i++) {
                  powerUpImages[i].css("display", "none"); // hide all current power ups
             }
-            
-            //update powerUps list to latest batch = lists.powerUps
-            powerUps = lists.powerUps;
-            
             
             // show only available powerups
             for (i = 0; i < powerUps.length; i++) {
