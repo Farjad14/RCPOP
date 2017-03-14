@@ -325,12 +325,10 @@ io.on('connection', function(socket) {
             srcCar.speed -= PUP_SPEED;
             //set start timer for power up
             srcCar.pUpTimerStart = Math.floor(Date.now() / 1000); 
-			console.log("power up 1");
         } 
         else if (srcCar.powerUp == 2) { // Speed up power up
           srcCar.speed += PUP_SPEED;
           srcCar.pUpTimerStart = Math.floor(Date.now() / 1000);
-		  console.log("power up 2");
         }
         else if (srcCar.powerUp == 3) { // Explosion power up
             var score = 0;
@@ -360,8 +358,6 @@ io.on('connection', function(socket) {
             // Increase score
             srcCar.score += score;
             updateLeaderboard();
-			
-			console.log("power up 3");
             
         } 
     }); 
@@ -507,8 +503,10 @@ function consumePowerUp(srcCarData){
     for (i = 0; i < powerUps.length; i++) {
         if (powerUps[i].x == srcCarData.x && powerUps[i].y == srcCarData.y 
         && powerUps[i].type == srcCarData.type ){
-            powerUps[i].consumed = 1;
-            return true
+            if (powerUps[i].consumed == 0) {}
+              powerUps[i].consumed = 1;
+              return true
+            }
         }
     }
     return false
