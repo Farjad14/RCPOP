@@ -131,6 +131,14 @@ fs.readFile('list.txt', 'utf8', function(err, data) {
     regex = data;
 });
 
+//sanitize
+var entityMap = {'&': '&amp;','<': '&lt;','>': '&gt;','"': '&quot;',"'": '&#39;','/': '&#x2F;','`': '&#x60;','=': '&#x3D;'};
+function escapeHtml (string) {
+  return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+    return entityMap[s];
+  });
+}
+
 
 /* ----------- Client Conection and all socket funcitons ----------- */
 
@@ -157,6 +165,7 @@ io.on('connection', function(socket) {
     Make sure the nickname is valid - if not, return to client with an 'id' taggged message
     */
     socket.on('new client', function(nickname) {
+        nickname = escapeHtml(nickname);
         if (nickname.length > 12 || nickname.length == 0) {
             console.log('invalid length');
             socket.emit("id", null);
@@ -422,14 +431,8 @@ io.on('connection', function(socket) {
     
     //Chat message
     socket.on('chat message', function(msg){
-        var validreg = new RegExp("[^A-Za-z0-9]");
-        if (validreg.test(msg)) {
-            console.log("not alpha");
-            return;
-        }
-        else{
-            io.emit('chat message', msg);
-        }
+       var str = escapeHtml(msg.msg);
+        io.emit('chat message', msg.name +": "+str);
     });
 
 

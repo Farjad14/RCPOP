@@ -6,13 +6,19 @@ var firstPowerUpPush = 0; //initial power up batch marker flag
 var kid = 0;
 
 var nickname = '';
+var entityMap = {'&': '&amp;','<': '&lt;','>': '&gt;','"': '&quot;',"'": '&#39;','/': '&#x2F;','`': '&#x60;','=': '&#x3D;'};
+function escapeHtml (string) {
+  return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+    return entityMap[s];
+  });
+}
 
 //UI
 $('#enter_link').click(function() {
     if (gameState != 0) return;
     nickname = $("#u").val();
     console.log(nickname);
-    socket.emit('new client', nickname);
+    socket.emit('new client', escapeHtml(nickname));
 });
 
 $('#tut').click(function() {
@@ -43,7 +49,10 @@ document.body.addEventListener("keydown", function(e) {
 }, false);
 
 $('#chatEntry').submit(function(){
-          socket.emit('chat message', $("#my_name").text() + ": " + $('#m').val());
+        //sanitize
+            var msg = escapeHtml($('#m').val());
+          socket.emit('chat message',{"name":$("#my_name").text(), "msg": msg});
+          console.log({"name":$("#my_name").text(), "msg": $('#m').val()});
           $("#m").blur();
           $('#m').val('');
           $("#m").focus();
