@@ -993,16 +993,16 @@ socket.on('update', function(lists) {
                 }
                 var diff = updatingCar.score - sprite.score;
                 if(diff ==1){
-                    setKillHud( "<h1> +1 single elemination</h>");
+                    setKillHud( "<h1> +1 single pop</h>");
                 }
                 else if(diff ==2){
-                    setKillHud( "<h1> +2 DOUBLE ELEMINATION!</h>");
+                    setKillHud( "<h1> +2 DOUBLE POP!</h>");
                 }
                 else if(diff ==3){
-                    setKillHud( "<h1> +3 TRIPLE ELEMINATION!</h>");
+                    setKillHud( "<h1> +3 TRIPLE POP!</h>");
                 }
                 else if(diff >3) {
-                    setKillHud( "<h1> +"+diff+" MULTI ELEMINATION!</h>");
+                    setKillHud( "<h1> +"+diff+" MULTI POP!</h>");
                 }
                 sprite.setScore(updatingCar.score);
                 sprite.setSpeed(updatingCar.speed);
