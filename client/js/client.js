@@ -80,7 +80,7 @@ var mouse_y = 0;
 
 //init end
 
-//define constants		
+//define constants
 const MAX_FEED_LENGTH = 5;
 const TIME_PER_ANIMATION = 40;
 
@@ -581,14 +581,12 @@ function detectpowerup(){
         if(powerUps[j].consumed == 1){
              continue;
         }
-        
-		powerUps[j].consumed == 1;
-		
+
         tipx = sprite.x + (Math.sin(toRadians(sprite.orientation)) * 100);
         tipy = sprite.y - (Math.cos(toRadians(sprite.orientation)) * 100);
         
         //a power up is a square with 100 x 100 dimensions
-		
+
         if ((Math.pow(tipx - (powerUps[j].x+50), 2) +
                 Math.pow(tipy - (powerUps[j].y+50), 2)) <= Math.pow(50, 2)) {
             console.log("power up event");

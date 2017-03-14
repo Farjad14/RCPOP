@@ -754,8 +754,8 @@ function generatePowerUps() {
     */
     
     // Diamond pattern - 4 corners
-    generatePupSquare(1, 625, 625, 1250, 1250, 2, 2);
-    generatePupDiamond(2, 625, 625, 625, 625, 3, 3);
+    generatePupSquare(1, 525, 625, 1250, 1250, 2, 2);
+    generatePupDiamond(2, 525, 625, 625, 625, 3, 3);
     
     generatePupSquare(1, 625, 3225, 1250, 1250, 2, 2);
     generatePupDiamond(2, 625, 3225, 625, 625, 3, 3);
