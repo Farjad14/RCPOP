@@ -1228,7 +1228,7 @@ socket.on('update', function(lists) {
             if (!found) { //if not found remove from dom
                 otherCars[i].car.sprite.remove();
                 nameTag = $("#"+(otherCars[i].car.nickname));
-                nickname.remove();
+                nameTag.remove();
                 otherCars.splice(i, 1);
                 mini_otherCars[i].remove();
                 mini_otherCars.splice(i, 1);
