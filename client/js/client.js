@@ -42,6 +42,16 @@ document.body.addEventListener("keydown", function(e) {
     }
 }, false);
 
+$('#chatEntry').submit(function(){
+          socket.emit('chat message', $("#my_name").text() + ": " + $('#m').val());
+          $("#m").blur();
+          $('#m').val('');
+          $("#m").focus();
+          return false;
+        });
+
+
+
 //Prevent zoom out
 document.body.addEventListener("wheel", zoomShortcut);
 // End of UI
@@ -876,12 +886,20 @@ socket.on('id', function(newCar) {
     //Reset Score
     sprite.setScore(0);
     $("#splashscreen").fadeOut(500);
+    $("#m").focus();
 
 
     gameState = 1 - gameState;
     gameLoop(start_fps);
 
 });
+
+//Chat message
+socket.on('chat message', function(msg){
+          $('#messages').append($('<li>').text(msg));
+          var element = document.getElementById("messages");
+            element.scrollTop = element.scrollHeight;
+        });
 
 socket.on('killfeed', function(list) {
     kid++;
@@ -1113,7 +1131,6 @@ socket.on('update', function(lists) {
             }
         } */
         //if (lists.powerUps.length != powerUps.length) console.log("Power up list length mismatch");
-
         
         for (i = 0; i < lists.deadCars.length; i++) {
             console.log('length of deadCars list: ' + lists.deadCars.length);
@@ -1136,6 +1153,8 @@ socket.on('update', function(lists) {
                 $("#finalScore").html("You scored: " + sprite.score);
                 setTimeout(function(){ 
                     $("#splashscreen").fadeIn(500);
+                    $("#m").blur();
+                    $("#u").focus();
                 }, 1000);
                 
                 // play popping audio
