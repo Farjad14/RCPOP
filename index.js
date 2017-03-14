@@ -422,7 +422,14 @@ io.on('connection', function(socket) {
     
     //Chat message
     socket.on('chat message', function(msg){
-        io.emit('chat message', msg);
+        var validreg = new RegExp("[^A-Za-z0-9]");
+        if (validreg.test(msg)) {
+            console.log("not alpha");
+            return;
+        }
+        else{
+            io.emit('chat message', msg);
+        }
     });
 
 
