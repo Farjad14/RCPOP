@@ -148,6 +148,10 @@ div {
     //background-color: pink;
 }
 
+@keyframes play {
+   100% { background-position: -720px; }
+}
+
 .pin {
     width: 4px;
     height: 50px;

@@ -63,6 +63,7 @@ var mouse_y = 0;
 
 //define constants		
 const MAX_FEED_LENGTH = 5;
+const TIME_PER_ANIMATION = 40;
 
 
 //utility functions
@@ -520,7 +521,17 @@ var powerUpImages = [];
 //init end
 
 
-
+/*
+finds car by id
+*/
+function findCarById(carId) {
+    for (i = 0; i < cars.length; i++) {
+        if (cars[i].id == carId) {
+            return cars[i];
+        }
+    }
+    return null;
+}
 
 //game mechanic functions
 function detectPop() {
@@ -611,6 +622,32 @@ function setKillHud(msg){
             $("#killHud").fadeOut(1000);
         }, 1000);
 }
+
+/*
+function advanceAnimations() {
+  // For each object we're animating check if it's time to move to the next image
+  for(i=0; i < animationList.length; i++) {
+    if (Date.now() - animationList[i].timeStamp > TIME_PER_ANIMATION) {
+      // If the animation is on the final image then remove it from the list
+      if (animationList[i].imageCounter == animationList[i].numImages) {
+        console.log("removing");
+        animationList[i].elementToRemove.remove()
+        animationList.splice(i, 1);
+        i--;
+        continue;
+      }
+      // move the animation to the next image
+      animationList[i].imageCounter++;
+      //imageName = animationList[i].imagePrefix + animationList[i].imageCounter + ".png";
+      //animationList[i].elementToAnimate.css('background-image', 'url(img/' + imageName);
+      animationList[i].timeStamp = Date.now();
+    }
+  }
+}
+
+*/
+
+
 
 //game loop
 /////////////////////
@@ -744,8 +781,6 @@ function gameLoop(fps) {
                         trgtid: otherId
                     });
                 }
-
-
 
             } catch (e) {
                 alert(e + "1");
@@ -914,7 +949,6 @@ socket.on('update', function(lists) {
     $("#leaderboard").html(lboard);
     //console.log("recieved update from the server.\n List of cars: ");
     try {
-        var still_alive = 0;
         // Upadate our list of other players
         for (i = 0; i < lists.cars.length; i++) {
             updatingCar = lists.cars[i];
@@ -946,7 +980,6 @@ socket.on('update', function(lists) {
                 }
                 sprite.setScore(updatingCar.score);
                 sprite.setSpeed(updatingCar.speed);
-                still_alive = 1;
                 continue;
             }
 
@@ -972,7 +1005,9 @@ socket.on('update', function(lists) {
             }
             // If it wasn't found add the new player to our array
             if (!found) {
-                otherCar = $('<div id="'+ updatingCar.id +'" class="opponentCar"><div class="pin"></div><div class="balloon"></div></div><div id="'+updatingCar.nickname+'" class="player_name">' + updatingCar.nickname + '</div>').appendTo("#map");
+                otherCar = $('<div id="' + updatingCar.id +
+                    '" class="opponentCar"><div class="pin"></div><div class="balloon"></div></div><div id="' +
+                    updatingCar.nickname + '" class="player_name">' + updatingCar.nickname + '</div>').appendTo("#map");
                 var newCar = new MoveSprite(otherCar, updatingCar.id, updatingCar.nickname);
                 newCar.setSpeed(10);
                 newCar.setPos(updatingCar.x, updatingCar.y);
@@ -1079,51 +1114,80 @@ socket.on('update', function(lists) {
             }
         } */
         //if (lists.powerUps.length != powerUps.length) console.log("Power up list length mismatch");
+
         
-        if (still_alive == 0) {
-            gameState = 0;
-            $("#finalScore").html("You scored: " + sprite.score);
-            setTimeout(function(){ 
-                $("#splashscreen").fadeIn(500);
-            }, 1000);
-
-        }
-
-        //check dead by pop
-        //for(i = 0; i < lists.deadCars.length; i++) {
-        //
         for (i = 0; i < lists.deadCars.length; i++) {
             console.log('length of deadCars list: ' + lists.deadCars.length);
             var w = 700 // Get the actual width/2 $("#stage").get(0).width;
             var h = 400 // Get the actual height/2 $("#stage").get(0).hieght;
-            if ((Math.abs(lists.deadCars[i].x - sprite.x) < w) && (Math.abs(lists.deadCars[i].y - sprite.y) < h)) {
+            var index;
+            console.log("dead car: " + lists.deadCars[i].id);
+            // Find the dead car in our list
+            for (j = 0; j < otherCars.length; j++) {
+              console.log("checking : " + otherCars[j].id);
+              if (otherCars[j].id == lists.deadCars[i].id) {
+                console.log("found");
+                index = j;
+              }
+            }
+
+            if (index == null) { // if no one else died than that means we die
+                // Eng game screen stuff
+                gameState = 0;
+                $("#finalScore").html("You scored: " + sprite.score);
+                setTimeout(function(){ 
+                    $("#splashscreen").fadeIn(500);
+                }, 1000);
+                
+                // play popping audio
+                $("#popped").get(0).play();
+                console.log("audio played")
+                
+                // Set funcitons to clean up after the balloon is done it's popping animation
+                balloon = sprite.sprite.find(".balloon");
+                setTimeout(function() { // remove the image until the splash screen comes back in
+                  balloon.css("animation", "none")
+                  balloon.css('background-image', 'none');
+                }, TIME_PER_ANIMATION*6);
+                setTimeout(function() {  //add the balloon back when the splash screen comes down
+                  balloon.css('background-image', 'url("img/balloon.png")');
+                }, 1500);
+                
+                // Animate balloon pop
+                balloon.css('background-image', 'none');
+                balloon.css('background', 'url(img/poppedBalloonSpriteSheet.png) left center');
+                balloon.css("animation", "play " + (TIME_PER_ANIMATION*6/1000) + "s steps(6)")
+                continue;
+                
+            }
+            // check if we can see the dying car
+            else if ((Math.abs(lists.deadCars[i].x - sprite.x) < w) && (Math.abs(lists.deadCars[i].y - sprite.y) < h)) {
+                // play popping audio
                 $("#popped").get(0).play();
                 console.log("audio played");
-                break;
+                // Start removal timeout
+                car = $('#' + (otherCars[index].id));
+                nameTag = $("#"+(otherCars[index].car.nickname));
+                setTimeout(function() { 
+                  car.remove();
+                  nameTag.remove();
+                }, TIME_PER_ANIMATION*6);
+                // Animate balloon pop
+                balloon = car.find(".balloon");
+                balloon.css('background-image', 'none');
+                balloon.css('background', 'url(img/poppedBalloonSpriteSheet.png) left center');
+                balloon.css("animation", "play " + (TIME_PER_ANIMATION*6/1000) + "s steps(6)")
+                console.log("popping animation in affect");
+                
+            } else {
+              console.log("far");
+              otherCars[index].car.sprite.remove(); // remove the html element of the car to be removed
             }
-
-        }
-
-
-        //check dead
-        for (i = 0; i < otherCars.length; i++) {
-
-            var found = false;
-            for (j = 0; j < lists.cars.length; j++) {
-
-                if (otherCars[i].id == lists.cars[j].id) {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) { //if not found remove from dom
-                otherCars[i].car.sprite.remove();
-                otherCars.splice(i, 1);
-                mini_otherCars[i].remove();
-                mini_otherCars.splice(i, 1);
-            }
-
+            console.log("xxx");
+            // Remove the dead car from our lists
+            otherCars.splice(index, 1);
+            mini_otherCars[index].remove();
+            mini_otherCars.splice(index, 1);
         }
 
 
