@@ -501,7 +501,7 @@ function consumePowerUp(srcCarData){
     for (i = 0; i < powerUps.length; i++) {
         if (powerUps[i].x == srcCarData.x && powerUps[i].y == srcCarData.y 
         && powerUps[i].type == srcCarData.type ){
-            if (powerUps[i].consumed == 0) {}
+            if (powerUps[i].consumed == 0) {
               powerUps[i].consumed = 1;
               return true
             }
