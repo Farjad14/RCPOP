@@ -723,7 +723,7 @@ function clearCollisionFlags() {
 
 function generatePupSquare(type, x_start, y_start, x_inc, y_inc, x_nums, y_nums) {
     for (i = 0; i < x_nums; i++) {
-        for (j = 0; j < x_nums; j++) {
+        for (j = 0; j < y_nums; j++) {
           newPowerUp = powerUp(x_start+i*x_inc, y_start+j*y_inc, type);
           powerUps.push(newPowerUp);
         }
@@ -732,7 +732,7 @@ function generatePupSquare(type, x_start, y_start, x_inc, y_inc, x_nums, y_nums)
 
 function generatePupDiamond(type, x_start, y_start, x_inc, y_inc, x_nums, y_nums) {
     for (i = 0; i < x_nums; i++) {
-        for (j = 0; j < x_nums; j++) {
+        for (j = 0; j < y_nums; j++) {
           if ((i+j) % 2 == 0) continue;
           newPowerUp = powerUp(x_start+i*x_inc, y_start+j*y_inc, type);
           powerUps.push(newPowerUp);
