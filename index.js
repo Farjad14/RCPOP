@@ -311,7 +311,7 @@ io.on('connection', function(socket) {
         console.log('potential powerup event');
         
         if (!consumePowerUp(srcCarData)) { //check and consume the powerUp
-            console.log("That power up doesn't exist");
+            console.log("The power up doesn't exist");
             return;
         } // marks powerup as consumed =1
         removePupEffct(srcCar); //remove effect of previous power up from srcCar
@@ -325,10 +325,12 @@ io.on('connection', function(socket) {
             srcCar.speed -= PUP_SPEED;
             //set start timer for power up
             srcCar.pUpTimerStart = Math.floor(Date.now() / 1000); 
+			console.log("power up 1");
         } 
         else if (srcCar.powerUp == 2) { // Speed up power up
           srcCar.speed += PUP_SPEED;
           srcCar.pUpTimerStart = Math.floor(Date.now() / 1000);
+		  console.log("power up 2");
         }
         else if (srcCar.powerUp == 3) { // Explosion power up
             var score = 0;
@@ -348,6 +350,7 @@ io.on('connection', function(socket) {
                   setKillFeed(srcCar, cars[i], "explosion"); // announce death
                   
               }
+			  
             }
             // increase car's speed for kills and check max speed
             srcCar.speed += speedInc;
@@ -357,6 +360,8 @@ io.on('connection', function(socket) {
             // Increase score
             srcCar.score += score;
             updateLeaderboard();
+			
+			console.log("power up 3");
             
         } 
     }); 

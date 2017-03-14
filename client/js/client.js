@@ -582,10 +582,13 @@ function detectpowerup(){
              continue;
         }
         
+		powerUps[j].consumed == 1;
+		
         tipx = sprite.x + (Math.sin(toRadians(sprite.orientation)) * 100);
         tipy = sprite.y - (Math.cos(toRadians(sprite.orientation)) * 100);
         
         //a power up is a square with 100 x 100 dimensions
+		
         if ((Math.pow(tipx - (powerUps[j].x+50), 2) +
                 Math.pow(tipy - (powerUps[j].y+50), 2)) <= Math.pow(50, 2)) {
             console.log("power up event");
@@ -593,8 +596,7 @@ function detectpowerup(){
              else if(powerUps[j].type == 2) {setKillHud( "<h1>Speed Up!</h>");}
              else if(powerUps[j].type == 3) {setKillHud( "<h1>Explosion!</h>");}
             return powerUps[j];
-        }
-            
+        }      
     }
     
     return null;
