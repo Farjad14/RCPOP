@@ -43,6 +43,8 @@ document.body.addEventListener("keydown", function(e) {
     }
 }, false);
 
+document.addEventListener('contextmenu', event => event.preventDefault());
+
 var entityMap = {'&': '&amp;','<': '&lt;','>': '&gt;','"': '&quot;',"'": '&#39;','/': '&#x2F;','`': '&#x60;','=': '&#x3D;'};
 var mapEntity = {'&amp;': '&','&lt;': '<','&gt;': '>','&quot;': '"','&#39;': "'",'&#x2F;': '/','&#x60;': '`','&#x3D;': '='};
 function escapeHtml (string) {
