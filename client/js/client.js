@@ -294,7 +294,7 @@ MoveSprite.prototype = {
         //s.sprite.css({'transform':'rotate(0deg)'});//prevent buggy position
         target_x = s.targetX;
         target_y = s.targetY;
-        //return;//remove this
+
         if (s.x == target_x && s.y == target_y) {
             return;
         }
@@ -404,7 +404,6 @@ MoveSprite.prototype = {
 
         s.targetX = target_x;
         s.targetY = target_y;
-        //return;//remove this
 
 
         speed = normalize_unit(s.speed);
@@ -1180,7 +1179,6 @@ socket.on('update', function(lists) {
                 console.log("popping animation in affect");
                 
             } else {
-              console.log("far");
               otherCars[index].car.sprite.remove(); // remove the html element of the car to be removed
             }
             console.log("xxx");
@@ -1190,7 +1188,25 @@ socket.on('update', function(lists) {
             mini_otherCars.splice(index, 1);
         }
 
+         // check all unaccounted deaths and clean them up
+        for (i = 0; i < otherCars.length; i++) {
+            var found = false;
+            for (j = 0; j < lists.cars.length; j++) {
+                if (otherCars[i].id == lists.cars[j].id) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) { //if not found remove from dom
+                otherCars[i].car.sprite.remove();
+                nameTag = $("#"+(otherCars[i].car.nickname));
+                nickname.remove();
+                otherCars.splice(i, 1);
+                mini_otherCars[i].remove();
+                mini_otherCars.splice(i, 1);
+            }
 
+        }
     } catch (e) {
         alert(e+ "3");
     }
