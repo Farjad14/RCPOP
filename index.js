@@ -66,6 +66,9 @@ car = function(x, y, orientation) {
         prevPUPStamp: 0,
         handlingPop: 0,
         curPUPStamp: 0,
+        chatTime: 0,
+        chatCount: 0,
+        chatBlocked: false,
     };
 
     return self;
@@ -431,7 +434,37 @@ io.on('connection', function(socket) {
     
     //Chat message
     socket.on('chat message', function(msg){
-        io.emit('chat message', msg);
+        var timeStamp = cars.find(x => x.nickname == msg.name).chatTime;
+        var index = cars.findIndex(x => x.nickname == msg.name);
+        var timeNow = new Date() / 1000;
+        //blank msg
+        if(msg.msg==""){
+            return;
+        }
+        if(cars[index].chatBlocked){
+            if(timeNow - timeStamp > 5){
+                cars[index].chatBlocked = false;
+                cars[index].chatCount = 0;
+            }
+            else{
+                return;
+            }
+        }
+        if(timeNow - timeStamp < 3){
+            cars[index].chatCount++;
+        }
+        else{
+             cars[index].chatCount = 0;
+        }
+        if(cars[index].chatCount == 5){
+            msg.name = "Server";
+            msg.msg = "Please don't spam the chat. You've been timed out for 5 seconds."
+            socket.emit('chat message',msg);
+            cars[index].chatBlocked = true;
+            return;
+        }
+            io.emit('chat message', msg);
+            cars[index].chatTime = timeNow;
     });
 
 
