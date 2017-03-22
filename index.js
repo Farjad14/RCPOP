@@ -434,6 +434,9 @@ io.on('connection', function(socket) {
     
     //Chat message
     socket.on('chat message', function(msg){
+        if(!cars.find(x => x.nickname == msg.name).chatTime){
+            return;
+        }
         var timeStamp = cars.find(x => x.nickname == msg.name).chatTime;
         var index = cars.findIndex(x => x.nickname == msg.name);
         var timeNow = new Date() / 1000;
