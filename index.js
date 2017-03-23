@@ -66,7 +66,7 @@ car = function(x, y, orientation) {
         prevPUPStamp: 0,
         handlingPop: 0,
         curPUPStamp: 0,
-        chatTime: 1,
+        chatTime: 0,
         chatCount: 0,
         chatBlocked: false,
     };
@@ -441,7 +441,7 @@ io.on('connection', function(socket) {
     
     //Chat message
     socket.on('chat message', function(msg){
-        if(!cars.find(x => x.nickname == msg.name).chatTime){
+        if(!cars.find(x => x.nickname == msg.name).x){
             return;
         }
         var timeStamp = cars.find(x => x.nickname == msg.name).chatTime;
