@@ -598,9 +598,9 @@ function detectpowerup(){
         if ((Math.pow(tipx - (powerUps[j].x+50), 2) +
                 Math.pow(tipy - (powerUps[j].y+50), 2)) <= Math.pow(50, 2)) {
             console.log("power up event");
-             if(powerUps[j].type == 1) {setKillHud( "<h1>Slowed!</h>");}
-             else if(powerUps[j].type == 2) {setKillHud( "<h1>Speed Up!</h>");}
-             else if(powerUps[j].type == 3) {setKillHud( "<h1>Explosion!</h>");}
+            if(powerUps[j].type == 1) {setKillHud( "<h1>Slowed!</h>");}
+            else if(powerUps[j].type == 2) {setKillHud( "<h1>Speed Up!</h>");}
+            else if(powerUps[j].type == 3) {setKillHud( "<h1>Explosion!</h>");}
             return powerUps[j];
         }      
     }
@@ -648,30 +648,6 @@ function setKillHud(msg){
             $("#killHud").fadeOut(1000);
         }, 1000);
 }
-
-/*
-function advanceAnimations() {
-  // For each object we're animating check if it's time to move to the next image
-  for(i=0; i < animationList.length; i++) {
-    if (Date.now() - animationList[i].timeStamp > TIME_PER_ANIMATION) {
-      // If the animation is on the final image then remove it from the list
-      if (animationList[i].imageCounter == animationList[i].numImages) {
-        console.log("removing");
-        animationList[i].elementToRemove.remove()
-        animationList.splice(i, 1);
-        i--;
-        continue;
-      }
-      // move the animation to the next image
-      animationList[i].imageCounter++;
-      //imageName = animationList[i].imagePrefix + animationList[i].imageCounter + ".png";
-      //animationList[i].elementToAnimate.css('background-image', 'url(img/' + imageName);
-      animationList[i].timeStamp = Date.now();
-    }
-  }
-}
-
-*/
 
 
 
@@ -835,23 +811,10 @@ function gameLoop(fps) {
 
 $(document).ready(function() {
 
-
-
-
     $("#go_animation").click(function() {
-
         gameState = 1 - gameState;
         gameLoop(start_fps);
-
-
     });
-
-    /*
-    $("#gameView").click(function(e){
-    spriteCam.toggleFollow();
-    });
-    */
-
 
 
     $("#gameView").mousemove(function(e) {
@@ -863,9 +826,6 @@ $(document).ready(function() {
         }
 
     });
-
-
-
 
 });
 
@@ -1154,7 +1114,7 @@ socket.on('update', function(lists) {
         //if (lists.powerUps.length != powerUps.length) console.log("Power up list length mismatch");
         
         for (i = 0; i < lists.deadCars.length; i++) {
-            console.log('length of deadCars list: ' + lists.deadCars.length);
+            //console.log('length of deadCars list: ' + lists.deadCars.length);
             var w = 700 // Get the actual width/2 $("#stage").get(0).width;
             var h = 400 // Get the actual height/2 $("#stage").get(0).hieght;
             var index;
@@ -1182,7 +1142,7 @@ socket.on('update', function(lists) {
                 $("#popped").get(0).play();
                 console.log("audio played")
                 
-                // Set funcitons to clean up after the balloon is done it's popping animation
+                // Set functions to clean up after the balloon is done it's popping animation
                 balloon = sprite.sprite.find(".balloon");
                 setTimeout(function() { // remove the image until the splash screen comes back in
                   balloon.css("animation", "none")
@@ -1246,6 +1206,48 @@ socket.on('update', function(lists) {
                 mini_otherCars.splice(i, 1);
             }
 
+        }
+        /*
+        for (i=0; i < lists.explosionLocs.length; i++) {
+            var w = 700 // Get the actual width/2 $("#stage").get(0).width;
+            var h = 400 // Get the actual height/2 $("#stage").get(0).hieght;
+            if ((Math.abs(lists.explosionLocs[i].x - sprite.x) < w) && (Math.abs(lists.explosionLocs[i].y - sprite.y) < h)) {
+              // Add explosion image as an html object
+              var explosionHTML = $('<div id="' + updatingCar.id +
+                  '" class="opponentCar"><div class="pin"></div><div class="balloon"></div></div><div id="' +
+                  updatingCar.nickname + '" class="player_name">' + updatingCar.nickname + '</div>').appendTo("#map");;
+              var explosion = new MoveSprite(explosionHTML, 0, "Explosion image");
+              explosion.setPos(lists.explosionLocs[i].x, lists.explosionLocs[i].y);
+              // Start removal timeout
+              setTimeout(function() { 
+                explosionHTML.remove();
+              }, TIME_PER_ANIMATION*74);
+              // Animate explosion pop
+              explosionHTML.css('background', 'url(img/explosionSpriteSheet.png) left center');
+              explosionHTML.css("animation", "explode " + (TIME_PER_ANIMATION*81/1000) + "s steps(9)")
+              console.log("exploding animation in affect");
+            }
+        }*/
+        for (i=0; i < lists.explosionLocs.length; i++) {
+            var w = 700 // Get the actual width/2 $("#stage").get(0).width;
+            var h = 400 // Get the actual height/2 $("#stage").get(0).hieght;
+            if ((Math.abs(lists.explosionLocs[i].x - sprite.x) < w) && (Math.abs(lists.explosionLocs[i].y - sprite.y) < h)) {
+              // Add explosion image as an html object
+              var explosionHTML = $('<div class="explosion"></div>').appendTo("#map");;
+              //var explosion = new MoveSprite(explosionHTML, 0, "Explosion image");
+              //explosion.setPos(lists.explosionLocs[i].x, lists.explosionLocs[i].y);/*$('<div class="explosion"></div>').appendTo("#map");;
+              explosionHTML.css({
+                left: lists.explosionLocs[i].x + "px",
+                top: lists.explosionLocs[i].y + "px"
+              });
+              // Start removal timeout
+              setTimeout(function() { 
+                explosionHTML.remove();
+              }, TIME_PER_ANIMATION*56);
+              // Animate explosion pop
+              explosionHTML.css("animation", "explode " + (TIME_PER_ANIMATION*56/1000) + "s steps(56)");
+              console.log("exploding animation in affect");
+            }
         }
     } catch (e) {
         alert(e+ "3");

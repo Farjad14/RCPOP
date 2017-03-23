@@ -94,6 +94,8 @@ powerUps = [];
 cars = [];
 //a list for dead cars that were popped in the current round -  30ms
 deadCars = [];
+// a list with locations for explosions
+explosionLocs = [];
 
 var numOfClients = 0; //initially zero
 
@@ -335,6 +337,10 @@ io.on('connection', function(socket) {
         else if (srcCar.powerUp == 3) { // Explosion power up
             var score = 0;
             var speedInc = 0;
+            explosionLocs.push({
+              x: srcCar.x,
+              y: srcCar.y
+            }); // set the explosion location to clients for animation purposes
             for (i = 0; i < cars.length; i++) { // Kill all cars in range
               if ((Math.pow(cars[i].x - srcCar.x, 2) + Math.pow(cars[i].y - srcCar.y, 2)) <
                   Math.pow(EXPLOSION_KILL_RANGE, 2) && (srcCar.id != cars[i].id)) {
@@ -360,6 +366,7 @@ io.on('connection', function(socket) {
             // Increase score
             srcCar.score += score;
             updateLeaderboard();
+            
             
         } 
     }); 
@@ -729,9 +736,11 @@ function updateClients() {
     io.emit('update', {
         cars: cars,
         powerUps: powerUps,
-        deadCars: deadCars
+        deadCars: deadCars,
+        explosionLocs: explosionLocs
     });
     deadCars = [];
+    explosionLocs = [];
 
     //called after broadcast to reset collision flags of cars
     clearCollisionFlags();
