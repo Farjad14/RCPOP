@@ -2,8 +2,6 @@
 var socket = io();
 var firstPowerUpPush = 0; //initial power up batch marker flag
 
-//kill id
-var kid = 0;
 
 var nickname = '';
 
@@ -42,6 +40,8 @@ document.body.addEventListener("keydown", function(e) {
         socket.emit('new client', nickname);
     }
 }, false);
+
+document.addEventListener('contextmenu', event => event.preventDefault());
 
 var entityMap = {'&': '&amp;','<': '&lt;','>': '&gt;','"': '&quot;',"'": '&#39;','/': '&#x2F;','`': '&#x60;','=': '&#x3D;'};
 var mapEntity = {'&amp;': '&','&lt;': '<','&gt;': '>','&quot;': '"','&#39;': "'",'&#x2F;': '/','&#x60;': '`','&#x3D;': '='};
@@ -913,14 +913,18 @@ socket.on('id', function(newCar) {
 
 //Chat message
 socket.on('chat message', function(msg){
-          $('#messages').append($('<li>').text(msg.name +": "+ htmlDecode(msg.msg)));
+           if(msg.name =="Server"){
+               $('#messages').append($('<li style="color:red;">').text(msg.name +": "+ htmlDecode(msg.msg)));
+           }
+           else{
+               $('#messages').append($('<li>').text(msg.name +": "+ htmlDecode(msg.msg)));
+           }
           var element = document.getElementById("messages");
             element.scrollTop = element.scrollHeight;
         });
 
 socket.on('killfeed', function(list) {
-    kid++;
-    var feed = "<p id='"+kid+"'>";
+    var feed = "<li>";
     var killed = "";
     
     // Determine if we are the killed car
@@ -932,7 +936,7 @@ socket.on('killfeed', function(list) {
     
     // Check deaths without killer cases
     if (list.cod === "out of bounds") {
-        feed += killed + " took the easy way out</p>";;
+        feed += killed + " hit the wall!</li>";;
     } else {
         var killer = "";
         // Determine if we are the killer
@@ -943,25 +947,24 @@ socket.on('killfeed', function(list) {
         }
       
         if(list.cod === "pop") {
-            feed += killer + "      popped      " + killed + "</p>";
+            feed += killer + "      popped      " + killed + "</li>";
         } else if (list.cod === "explosion") { 
-            feed += killer + "   blew up   " + killed + "'s balloon</p>";
+            feed += killer + "   blew up   " + killed + "'s balloon</li>";
       
         }
     }
     
-    //add to killfeed
-    $("#killfeed").append(feed);
-    if (kid > MAX_FEED_LENGTH){
-        //$("#killfeed").empty();
-        $("#"+(kid - MAX_FEED_LENGTH)).remove();
-    } 
+    //add to chat
+    $("#messages").append(feed);
     //animate
-    $("#killfeed").fadeIn(500);
+    /*$("#killfeed").fadeIn(500);
     setTimeout(function(){
         $("#killfeed").fadeOut(1000);       
     }, 3000);
+    */
     
+    var element = document.getElementById("messages");
+    element.scrollTop = element.scrollHeight;
         
 });
 
