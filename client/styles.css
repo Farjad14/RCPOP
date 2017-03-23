@@ -151,18 +151,18 @@ div {
     position: absolute;
     left: 50%;
     top: 50%;
-    height: 500px;
-    width: 500px;
+    height: 950px;
+    width: 950px;
     padding: 0;
-    margin-left: -250px;
-    margin-top: -250px;
+    margin-left: -475px;
+    margin-top: -475px;
     background-image: url(img/explosionSpriteSheet.png);
 
 }
 
 @keyframes explode {
   0% { background-position: 0px 0px; }
-  100% { background-position: -28000px 0px; }
+  100% { background-position: -53200px 0px; }
 }
 
 
