@@ -44,9 +44,15 @@ div {
     height: 100%;
     overflow: hidden;
     background-color: rgb(73, 0, 0);
+    z-index: 2;
+}
+
+#particles{
+    z-index: 0;
 }
 
 #map {
+    z-index: 0;
     display: block;
     position: absolute;
     width: 5000px;

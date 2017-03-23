@@ -1233,7 +1233,7 @@ socket.on('update', function(lists) {
             var h = 400 // Get the actual height/2 $("#stage").get(0).hieght;
             if ((Math.abs(lists.explosionLocs[i].x - sprite.x) < w) && (Math.abs(lists.explosionLocs[i].y - sprite.y) < h)) {
               // Add explosion image as an html object
-              var explosionHTML = $('<div class="explosion"></div>').appendTo("#map");;
+              var explosionHTML = $('<div class="explosion"></div>').appendTo("#particles");;
               //var explosion = new MoveSprite(explosionHTML, 0, "Explosion image");
               //explosion.setPos(lists.explosionLocs[i].x, lists.explosionLocs[i].y);/*$('<div class="explosion"></div>').appendTo("#map");;
               explosionHTML.css({
