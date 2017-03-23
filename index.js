@@ -66,7 +66,7 @@ car = function(x, y, orientation) {
         prevPUPStamp: 0,
         handlingPop: 0,
         curPUPStamp: 0,
-        chatTime: 0,
+        chatTime: 1,
         chatCount: 0,
         chatBlocked: false,
     };
