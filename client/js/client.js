@@ -86,6 +86,12 @@ var gameState = 0; //0 - game inactive; 1 - game active
 var mouse_x = 0;
 var mouse_y = 0;
 
+// Prefetch animation images
+var my_image = new Image();
+my_image.src = '/img/explosionSpriteSheet.png';
+var my_image2 = new Image();
+my_image2.src = '/img/poppedBalloonSpriteSheet.png';
+
 //init end
 
 //define constants
@@ -1032,7 +1038,6 @@ socket.on('update', function(lists) {
                     powerUpImages[i].css("left", powerUps[i].x + "px");
                     powerUpImages[i].css("top", powerUps[i].y + "px");
 
-
                 } else if (powerUps[i].type == 2) {
                     powerUpImages.push($('<div class="powerUp2"></div>'));
                     powerUpImages[i].appendTo("#map");
@@ -1115,8 +1120,8 @@ socket.on('update', function(lists) {
         
         for (i = 0; i < lists.deadCars.length; i++) {
             //console.log('length of deadCars list: ' + lists.deadCars.length);
-            var w = 700 // Get the actual width/2 $("#stage").get(0).width;
-            var h = 400 // Get the actual height/2 $("#stage").get(0).hieght;
+            var w = 800 // Get the actual width/2 $("#stage").get(0).width;
+            var h = 500 // Get the actual height/2 $("#stage").get(0).hieght;
             var index;
             console.log("dead car: " + lists.deadCars[i].id);
             // Find the dead car in our list
@@ -1207,35 +1212,13 @@ socket.on('update', function(lists) {
             }
 
         }
-        /*
+        
         for (i=0; i < lists.explosionLocs.length; i++) {
-            var w = 700 // Get the actual width/2 $("#stage").get(0).width;
-            var h = 400 // Get the actual height/2 $("#stage").get(0).hieght;
-            if ((Math.abs(lists.explosionLocs[i].x - sprite.x) < w) && (Math.abs(lists.explosionLocs[i].y - sprite.y) < h)) {
-              // Add explosion image as an html object
-              var explosionHTML = $('<div id="' + updatingCar.id +
-                  '" class="opponentCar"><div class="pin"></div><div class="balloon"></div></div><div id="' +
-                  updatingCar.nickname + '" class="player_name">' + updatingCar.nickname + '</div>').appendTo("#map");;
-              var explosion = new MoveSprite(explosionHTML, 0, "Explosion image");
-              explosion.setPos(lists.explosionLocs[i].x, lists.explosionLocs[i].y);
-              // Start removal timeout
-              setTimeout(function() { 
-                explosionHTML.remove();
-              }, TIME_PER_ANIMATION*74);
-              // Animate explosion pop
-              explosionHTML.css('background', 'url(img/explosionSpriteSheet.png) left center');
-              explosionHTML.css("animation", "explode " + (TIME_PER_ANIMATION*81/1000) + "s steps(9)")
-              console.log("exploding animation in affect");
-            }
-        }*/
-        for (i=0; i < lists.explosionLocs.length; i++) {
-            var w = 700 // Get the actual width/2 $("#stage").get(0).width;
-            var h = 400 // Get the actual height/2 $("#stage").get(0).hieght;
+            var w = 1600 // Get the actual width/2 $("#stage").get(0).width;
+            var h = 1300 // Get the actual height/2 $("#stage").get(0).hieght;
             if ((Math.abs(lists.explosionLocs[i].x - sprite.x) < w) && (Math.abs(lists.explosionLocs[i].y - sprite.y) < h)) {
               // Add explosion image as an html object
               var explosionHTML = $('<div class="explosion"></div>').appendTo("#particles");;
-              //var explosion = new MoveSprite(explosionHTML, 0, "Explosion image");
-              //explosion.setPos(lists.explosionLocs[i].x, lists.explosionLocs[i].y);/*$('<div class="explosion"></div>').appendTo("#map");;
               explosionHTML.css({
                 left: lists.explosionLocs[i].x + "px",
                 top: lists.explosionLocs[i].y + "px"
@@ -1243,9 +1226,15 @@ socket.on('update', function(lists) {
               // Start removal timeout
               setTimeout(function() { 
                 explosionHTML.remove();
-              }, TIME_PER_ANIMATION*56);
+              }, TIME_PER_ANIMATION*45);
+              
               // Animate explosion pop
-              explosionHTML.css("animation", "explode " + (TIME_PER_ANIMATION*56/1000) + "s steps(56)");
+              /*for(j=1; j < 56; j++){
+                setTimeout(function() {
+                  //explosionHTML.css("background-position: " + (-1)*(j*950) + "px");
+                }, j*TIME_PER_ANIMATION*(45/56));
+              }*/
+              explosionHTML.css("animation", "explode " + (TIME_PER_ANIMATION*45/1000) + "s steps(56)");
               console.log("exploding animation in affect");
             }
         }
