@@ -86,11 +86,17 @@ var gameState = 0; //0 - game inactive; 1 - game active
 var mouse_x = 0;
 var mouse_y = 0;
 
+var curPUPStamp = 0;
+var prevPUPStamp = 0;
 // Prefetch animation images
 var my_image = new Image();
 my_image.src = '/img/explosionSpriteSheet.png';
 var my_image2 = new Image();
 my_image2.src = '/img/poppedBalloonSpriteSheet.png';
+var my_image3 = new Image();
+my_image3.src = '/img/greenEffect.png';
+var my_image4 = new Image();
+my_image4.src = '/img/redEffect.png';
 
 //init end
 
@@ -590,7 +596,12 @@ function detectPop() {
 
 
 function detectpowerup(){
-    
+    // if the two collision are too close - within 250ms, ignore the second one 
+    curPUPStamp = Date.now();
+    if(curPUPStamp - prevPUPStamp < 250){
+      return;
+    }
+            
      for (j = 0; j < powerUps.length; j++) {
         if(powerUps[j].consumed == 1){
              continue;
@@ -604,9 +615,41 @@ function detectpowerup(){
         if ((Math.pow(tipx - (powerUps[j].x+50), 2) +
                 Math.pow(tipy - (powerUps[j].y+50), 2)) <= Math.pow(50, 2)) {
             console.log("power up event");
-            if(powerUps[j].type == 1) {setKillHud( "<h1>Slowed!</h>");}
-            else if(powerUps[j].type == 2) {setKillHud( "<h1>Speed Up!</h>");}
+            if(powerUps[j].type == 1) {
+              setKillHud( "<h1>Slowed!</h>");
+              // Add powerDownparticle image as an html object
+              var downHTML = $('<div class="powerDown"></div>').appendTo("#particles");
+              downHTML.css({
+                left: sprite.x + "px",
+                top: sprite.y + "px"
+              });
+              // Start removal timeout
+              setTimeout(function() { 
+                downHTML.remove();
+              }, TIME_PER_ANIMATION*4);
+
+              downHTML.css("animation", "power " + (TIME_PER_ANIMATION*4/1000) + "s steps(4)");
+            }
+            else if(powerUps[j].type == 2) {
+              setKillHud( "<h1>Speed Up!</h>");
+              // Add powerDownparticle image as an html object
+              var upHTML = $('<div class="powerUp"></div>').appendTo("#particles");
+              upHTML.css({
+                left: sprite.x + "px",
+                top: sprite.y + "px"
+              });
+              // Start removal timeout
+              setTimeout(function() { 
+                upHTML.remove();
+              }, TIME_PER_ANIMATION*4);
+
+              upHTML.css("animation", "power " + (TIME_PER_ANIMATION*4/1000) + "s steps(4)");
+            }
             else if(powerUps[j].type == 3) {setKillHud( "<h1>Explosion!</h>");}
+            
+            // Update time stamp
+            powerUps[j].consumed = 1;
+            prevPUPStamp = curPUPStamp;
             return powerUps[j];
         }      
     }
@@ -1217,6 +1260,8 @@ socket.on('update', function(lists) {
             var w = 1600 // Get the actual width/2 $("#stage").get(0).width;
             var h = 1300 // Get the actual height/2 $("#stage").get(0).hieght;
             if ((Math.abs(lists.explosionLocs[i].x - sprite.x) < w) && (Math.abs(lists.explosionLocs[i].y - sprite.y) < h)) {
+              // Play explosion sound
+              $("#boom").get(0).play();
               // Add explosion image as an html object
               var explosionHTML = $('<div class="explosion"></div>').appendTo("#particles");;
               explosionHTML.css({

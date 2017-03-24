@@ -157,12 +157,43 @@ div {
     margin-left: -475px;
     margin-top: -475px;
     background-image: url(img/explosionSpriteSheet.png);
-
 }
 
 @keyframes explode {
   0% { background-position: 0px 0px; }
   100% { background-position: -53200px 0px; }
+}
+
+
+.powerDown {
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    height: 140px;
+    width: 140px;
+    padding: 0;
+    margin-left: -70px;
+    margin-top: -70px;
+    background-image: url(img/redEffect.png);
+}
+
+.powerUp {
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    height: 140px;
+    width: 140px;
+    padding: 0;
+    margin-left: -70px;
+    margin-top: -70px;
+    background-image: url(img/greenEffect.png);
+}
+    
+@keyframes power {
+  0% { background-position: 0px 0px; }
+  100% { background-position: -560px 0px; }
 }
 
 
