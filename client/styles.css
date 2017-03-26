@@ -205,6 +205,13 @@ div {
     margin-left: -2px;
     background-color: black;
 }
+#center {
+    width: 70px;
+    height: 75px;
+    left: 15px;
+    top: 15px;
+}
+
 
 #go_animation {
     display: none;
@@ -398,8 +405,13 @@ div {
   font-size: 30px;
   background-color: rgba(0,0,0,0.7);
 }
-.shadow{
-  text-shadow:0px 0px 50px red;
+.redShadow{
+  box-shadow:0px 0px 50px red;
+  z-index: 0;
+}
+.greenShadow{
+  box-shadow:0px 0px 50px green;
+  z-index: 0;
 }
 
 #killHud {

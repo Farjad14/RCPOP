@@ -617,6 +617,10 @@ function detectpowerup(){
             console.log("power up event");
             if(powerUps[j].type == 1) {
               setKillHud( "<h1>Slowed!</h>");
+              /*$( "#center" ).addClass( "redShadow" );
+              setTimeout(function() { 
+                $( "#center" ).removeClass( "redShadow" );
+              }, 4000);*/
               // Add powerDownparticle image as an html object
               var downHTML = $('<div class="powerDown"></div>').appendTo("#particles");
               downHTML.css({
@@ -632,6 +636,10 @@ function detectpowerup(){
             }
             else if(powerUps[j].type == 2) {
               setKillHud( "<h1>Speed Up!</h>");
+              /*$( "#center" ).addClass( "greenShadow" );
+              setTimeout(function() { 
+                $( "#center" ).removeClass( "greenShadow" );
+              }, 4000);*/
               // Add powerDownparticle image as an html object
               var upHTML = $('<div class="powerUp"></div>').appendTo("#particles");
               upHTML.css({
