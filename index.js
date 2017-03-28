@@ -421,14 +421,14 @@ io.on('connection', function(socket) {
         newSrcCarOrientation = trgtCar.orientation;
 
         //updated orientation and position of srcCar - position is 100 pixels ahead along the new orientation
-        srcCar.orientation = newSrcCarOrientation;
+        //srcCar.orientation = newSrcCarOrientation;
         srcCar.x = srcCar.x + (srcCar.x - trgtCar.x);
         srcCar.y = srcCar.y - (srcCar.y - trgtCar.y);
         srcCar.prev_x = srcCar.x;
         srcCar.prev_y = srcCar.y;
 
         //updated orientation and position of trgCar - position is 100 pixels ahead along the new orientation
-        trgtCar.orientation = newTrgtCarOrientation;
+        //trgtCar.orientation = newTrgtCarOrientation;
         trgtCar.x = trgtCar.x + (trgtCar.x - srcCar.x);
         trgtCar.y = trgtCar.y - (trgtCar.y - srcCar.y);
         trgtCar.prev_x = trgtCar.x;

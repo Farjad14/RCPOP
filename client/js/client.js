@@ -944,9 +944,20 @@ socket.on('killfeed', function(list) {
     var feed = "<li>";
     var killed = "";
     
+    
+        
+    
     // Determine if we are the killed car
-    if (list.cars[1].nickname == $("#my_name").text()) {
-        killed =  "<span class='self'>" + list.cars[1].nickname + "</span>";
+    if(list.cars[1].id == id){
+	killed =  "<span class='self'>" + list.cars[1].nickname + "</span>";
+
+	//set revenge target on minimap
+	for (i = 0; i < mini_otherCars.length; i++) {
+		if(otherCars[i].id == list.cars[0].id){
+		    mini_otherCars[i].addClass("revenge_target");
+		}
+        }
+
     } else {
         killed =  "<span class='enemy'>" + list.cars[1].nickname + "</span>";
     }

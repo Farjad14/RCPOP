@@ -362,6 +362,11 @@ div {
     border: 1px solid #4286f4;
     border-radius: 50%;
 }
+
+.revenge_target {
+    background-color:red;
+}
+
 .enemy{
     color:red;
 }
